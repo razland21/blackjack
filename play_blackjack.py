@@ -65,18 +65,25 @@ def	sum_cards(hand):
 
 	return sum_hand
 
-"""			
-[fn] check_21 (hand)
+def check_21(hand):
 	sum_hand = sum_cards(hand)
 	has_ace = False
 	
-	check if ace is in deck - if yes, has_ace = True
+	#check if Ace is in hand
+	for card in hand:
+		if 'A' in card:
+			has_ace = True
+			break
 	
-	if sum_hand = 21,
+	if sum_hand == 21:
 		return True
-	if has_ace = True,
-		check sum_hand-10 = 21
-	else return False
+	elif has_ace:
+		return (sum_hand - 10) == 21
+	else:
+		return False
+
+		
+"""			
 
 [fn] check_busted (hand)
 	if sum_cards(hand) > 21, return True
@@ -135,7 +142,7 @@ def play_blackjack():
 			break
 
 			
-play_blackjack()
+#play_blackjack()
 """			
 code outline:
 

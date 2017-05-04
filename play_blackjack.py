@@ -24,9 +24,9 @@ def deal_cards(num_cards, used_cards):
 	return cards
 
 	
-def print_board (all_hands, show_dealer_hand):
+def print_board(all_hands, show_dealer_hand):
 	"""
-	Assumptions: if show_dealer_hand is False, then there are only two cards in deck (i.e. want to hide the first card)
+	Assumption: if show_dealer_hand is False, then there are only two cards in deck (i.e. want to hide the first card)
 	"""
 	print "***DEALER***"
 	if show_dealer_hand:
@@ -43,11 +43,27 @@ def print_board (all_hands, show_dealer_hand):
 	print "\n"
 
 			
-def print_card (card_tuple):
+def print_card(card_tuple):
 	"""
 	Card is represented in tuple as (value, suit)
 	"""
 	print str(card_tuple[0]) + card_tuple[1],
+
+def	sum_cards(hand):
+	"""
+	Assumption: A = 11.
+	"""
+	sum_hand = 0
+	
+	for card in hand:
+		if card[0] in ['J', 'Q', 'K']:
+			sum_hand += 10
+		elif card[0] == 'A':
+			sum_hand += 11
+		else:
+			sum_hand += card[0]
+
+	return sum_hand
 
 """			
 [fn] check_21 (hand)
@@ -64,16 +80,6 @@ def print_card (card_tuple):
 
 [fn] check_busted (hand)
 	if sum_cards(hand) > 21, return True
-
-[fn] sum_cards (hand)
-	sum_hand = 0
-	for all cards in hand
-		add value to hand
-		if J/Q/K, add 10
-		if A,
-			add 11
-
-	return sum_hand
 
 [fn] print_options()
 	Choose from the following options:
@@ -102,6 +108,7 @@ def play_blackjack():
 		print "3 - shuffle cards"
 		print "4 - show current hand"
 		print "5 - print board"
+		print "6 - sum hand"
 		print "0 - exit"
 		
 		option = int(raw_input("Enter number: "))
@@ -121,6 +128,9 @@ def play_blackjack():
 		elif option == 5:
 			print_board(hands_dict, True)
 			print_board(hands_dict, False)
+		elif option == 6:
+			sum_hand = raw_input("Whose hand do you want to add? dealer or player ")
+			print sum_cards(hands_dict[sum_hand])
 		else:
 			break
 

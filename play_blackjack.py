@@ -80,6 +80,9 @@ def check_21(hand):
 		return False
 
 def check_busted(hand):
+	"""
+	Returns True if hand is greater than 21.
+	"""
 	if sum_cards(hand) > 21:
 		return True
 	else:
@@ -97,14 +100,25 @@ def deck_needs_shuffling(num_cards_used):
 	"""
 	return num_cards_used > 40
 	
-"""			
+def print_options():
+	print "Choose from the following options:"
+	print "1 - Hit"
+	print "2 - Stand"
 
-[fn] print_options()
-	Choose from the following options:
-	1 - Hit
-	2 - Stand
-
-	
+def valid_move(move):
+	if len(move) == 0:
+		print "You have to put something."
+		return False
+	elif not move.isdigit():
+		print "You must enter a number."
+		return False
+	elif int(move) > 2:
+		print "You must enter one of the numbers above."
+		return False
+	else:
+		return True
+		
+"""	
 [fn] check_winner(dealer_hand, player_hand)
 
 """
@@ -115,7 +129,7 @@ def play_blackjack():
 	used_cards_indices = []
 	hands_dict = {'dealer': [], 'player': []}
 	
-	#start game
+	#*** GAME START ***
 	while True:
 		#check if deck needs shuffling
 		if deck_needs_shuffling(len(used_cards_indices)):
@@ -124,10 +138,7 @@ def play_blackjack():
 		#deal cards to all people in game
 		for person in hands_dict:
 			hands_dict[person] = deal_cards(2,used_cards_indices)
-			
-		#print board, hide dealer's first card
-		print_board(hands_dict,False)
-		
+					
 		#check if anyone has 21 
 		has_21 = False
 		for person in hands_dict:
@@ -137,17 +148,57 @@ def play_blackjack():
 					print_board(hands_dict,True)
 					print "Sorry, dealer has 21.  You lose."
 				else:
+					print_board(hands_dict,True) 	#CHANGE IF MULTIPLE PEOPLE
 					print "{} has Blackjack! You win!".format(person)
 				
 		if has_21:
-			print "someone has 21"
+			print "someone has 21"  #REMOVE LATER
 			break
 		
-		print "game continued"
+		#*** PLAYER GAME LOOP START ***
+		
+		while True:
+			print_board(hands_dict, False)
+			print "Player's Turn\n"
+			print_options()
+			move = raw_input("Enter the number for the move you want to make: ").strip()
+			
+			#if move is not valid, start loop over
+			if not valid_move(move):
+				continue
+		
+			if move == "1":
+				print "\nPlayer hits."
+				hit(hands_dict['player'], used_cards_indices)
+				if check_busted(hands_dict['player']):
+					print_board(hands_dict, True)
+					print "Busted! You lose."
+					break
+				elif check_21(hands_dict['player']):
+					print_board(hands_dict, False)
+					print "You have 21. Turn is over."
+				
+				
+			elif move == "2":
+				print "\nPlayer stands.  Turn is over."
+				break
+			
+			
+		print "game continued" #REMOVE LATER
 		break
 	
-	#end game
-
+	#end game - prompt to replay
+	while True:
+		replay = raw_input("Do you want to play again?  Type 'yes' or 'no'.: ").strip().lower()
+		if replay == "yes":
+			print "Alright, let's play again!"
+			play_blackjack()
+			break
+		elif replay == "no":
+			print "Thanks for playing!"
+			break 
+		else:
+			print "Sorry, I'm not sure what you mean by {}.".format(replay)
 	
 	
 
@@ -214,17 +265,17 @@ code outline:
 			- if yes, automatic lose
 	
 	*** PLAYER GAME LOOP START ***
-	[fn] print gameplay options
+**	[fn] print gameplay options
 			- hit
 			- stand
 			[more later]
-	ask player to choose option
+**	ask player to choose option
 	
-	if player chooses hit, give player another card.
-		[fn] hit
-		[*fn] print game board -- showing new card added to player's hand
+**	if player chooses hit, give player another card.
+**		[fn] hit
+**		[*fn] print game board -- showing new card added to player's hand
 		[*fn] check if player has 21 -- if yes, turn is over (not automatic win)
-		[fn] check if player is over 21 -- if yes, automatic lose
+**		[fn] check if player is over 21 -- if yes, automatic lose
 	
 	if player chooses stand, player turn ends.
 	

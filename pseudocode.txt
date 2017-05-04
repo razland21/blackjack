@@ -1,0 +1,140 @@
+notation:
+[fn] - function to write
+[*fn] - function already exists in outline
+
+things to define:
+	- card deck: a list of tuples, each tuple representing a card
+
+things to keep track of:
+	- how many cards in the deck have been used (i.e. how many are remaining for play)
+	- which cards have already been used
+	- hands for player and dealer (dictionary?)
+	- player win status
+
+code outline:
+
+[fn] main function to start blackjack game
+
+	[fn] shuffle deck if needed
+	[fn] deal cards
+	[fn] print game board -- showing player's 2 cards and dealer's 2nd card only
+	[fn] check if player has 21 to start 
+			- if yes, automatic win
+			- if no, continue
+	
+	*** PLAYER GAME LOOP START ***
+	[fn] print gameplay options
+			- hit
+			- stand
+			[more later]
+	ask player to choose option
+	
+	if player chooses hit, give player another card.
+		[fn] hit
+		[*fn] print game board -- showing new card added to player's hand
+		[*fn] check if player has 21 -- if yes, turn is over (not automatic win)
+		[fn] check if player is over 21 -- if yes, automatic lose
+	
+	if player chooses stand, player turn ends.
+	
+	*** PLAYER GAME LOOP END ***
+	
+	*** DEALER GAME LOOP START ***
+	[*fn] print game board -- show both of dealer's cards  [print game board needs to take y/n argument for showing dealer's other card]
+			- if player has already lost, end here.
+			
+	[*fn] check if dealer is busted -- if yes, turn is over, player automatically wins
+	[*fn] check if dealer has 17 
+		- if yes, dealer's turn is over (not automatic win)
+		- if no, hit again
+	
+	
+	*** DEALER GAME LOOP END ***
+			
+	*** CHECK FOR WINNER ***
+	if player already won/lost, then done.  
+	else:
+	[fn] check who has higher number, dealer or winner
+
+individual functions:
+
+[fn] shuffle deck
+	clear list of already used cards
+
+[fn] deal_cards (num_cards)
+	cards = []
+	for number of cards needed:
+		generate random number between 0-51
+		check if number has already been used during this shuffle
+			if yes, generate another number
+			if no, 
+				add number to already used list
+				add corresponding card to cards list
+	return cards
+	
+	
+[fn] print_board (all_hands, show_dealer_hand)
+	show_dealer_hand: if True, then show all cards in dealer hand.  if False, only show one card (assumes only 2 cards if no).
+	print "DEALER:"
+		if show_dealer_hand = yes:
+			print '[]' + dealer[1]  
+			else:
+			for all cards in deck
+				print card
+	
+	print "PLAYER:"
+		for all cards in deck
+			print card
+	
+[fn] check_21 (hand)
+	sum_hand = sum_cards(hand)
+	has_ace = False
+	
+	check if ace is in deck - if yes, has_ace = True
+	
+	if sum_hand = 21,
+		return True
+	if has_ace = True,
+		check sum_hand-10 = 21
+	else return False
+
+[fn] check_busted (hand)
+	if sum_cards(hand) > 21, return True
+
+[fn] sum_cards (hand)
+	sum_hand = 0
+	for all cards in hand
+		add value to hand
+		if J/Q/K, add 10
+		if A,
+			add 11
+
+	return sum_hand
+
+[fn] print_options()
+	Choose from the following options:
+	1 - Hit
+	2 - Stand
+
+[fn] hit(hand)
+	deal_cards(1) -- returns list of one card
+	add card to deck 
+	
+[fn] check_winner(dealer_hand, player_hand)
+
+	
+MVP
+- single player: 1 player vs AI
+- main game loop
+- dealer stops at 17 (including soft 17? TBD)
+- no betting
+
+Backlog
+- betting
+- allow for doubling down on 10/11
+- allow for splitting pairs
+- multiple players
+- option to use multiple decks
+- insurance if dealer is showing A
+- main menu
+- change settings for rules

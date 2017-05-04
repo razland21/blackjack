@@ -19,8 +19,10 @@ code outline:
 	[fn] deal cards
 	[fn] print game board -- showing player's 2 cards and dealer's 2nd card only
 	[fn] check if player has 21 to start 
-			- if yes, automatic win
+			- if yes, automatic win (later - draw if both have 21)
 			- if no, continue
+	[fn] check if dealer has 21 to start
+			- if yes, automatic lose
 	
 	*** PLAYER GAME LOOP START ***
 	[fn] print gameplay options

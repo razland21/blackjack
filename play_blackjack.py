@@ -10,7 +10,6 @@ def shuffle_deck(used_cards):
 	del used_cards[0:]
 	print "Cards have been shuffled."
 	
-
 def deal_cards(num_cards, used_cards):
 	cards = []
 	
@@ -22,7 +21,6 @@ def deal_cards(num_cards, used_cards):
 			cards.append(deck[new_card_index])
 	
 	return cards
-
 	
 def print_board(all_hands, show_dealer_hand):
 	"""
@@ -41,7 +39,6 @@ def print_board(all_hands, show_dealer_hand):
 		print_card(card)
 	
 	print "\n"
-
 			
 def print_card(card_tuple):
 	"""
@@ -82,20 +79,31 @@ def check_21(hand):
 	else:
 		return False
 
-		
-"""			
+def check_busted(hand):
+	if sum_cards(hand) > 21:
+		return True
+	else:
+		return False
 
-[fn] check_busted (hand)
-	if sum_cards(hand) > 21, return True
+def hit(hand, used_cards):
+	"""
+	deal_cards returns a list of one card - need to append the card itself to the hand
+	"""
+	hand.append(deal_cards(1,used_cards)[0])
+
+def deck_needs_shuffling(num_cards_used):
+	"""
+	Assumption: deck needs to be shuffled if there are <12 cards remaining.  (this can change later with more players)
+	"""
+	return num_cards_used > 40
+	
+"""			
 
 [fn] print_options()
 	Choose from the following options:
 	1 - Hit
 	2 - Stand
 
-[fn] hit(hand)
-	deal_cards(1) -- returns list of one card
-	add card to deck 
 	
 [fn] check_winner(dealer_hand, player_hand)
 
@@ -104,6 +112,28 @@ def check_21(hand):
 
 #MAIN GAME
 def play_blackjack():
+	used_cards_indices = []
+	hands_dict = {'dealer': [], 'player': []}
+	
+	while True:
+		#check if deck needs shuffling
+		if deck_needs_shuffling(len(used_cards_indices)):
+			shuffle_deck(used_cards_indices)
+		
+		#deal cards to all people in game
+		for person in hands_dict:
+			hands_dict[person] = deal_cards(2,used_cards_indices)
+			
+		#print board, hide dealer's first card
+		print_board(hands_dict,False)
+		
+		break
+	#play game
+	
+	
+
+#TESTS
+def tests():
 
 	used_cards_indices = []
 	hands_dict = {'dealer': [], 'player': []}
@@ -116,6 +146,7 @@ def play_blackjack():
 		print "4 - show current hand"
 		print "5 - print board"
 		print "6 - sum hand"
+		print "7 - hit"
 		print "0 - exit"
 		
 		option = int(raw_input("Enter number: "))
@@ -138,6 +169,12 @@ def play_blackjack():
 		elif option == 6:
 			sum_hand = raw_input("Whose hand do you want to add? dealer or player ")
 			print sum_cards(hands_dict[sum_hand])
+		elif option == 7:
+			give_card = raw_input("Who should card go to? dealer or player ")
+			print "old deck: {}".format(hands_dict[give_card])
+			hit(hands_dict[give_card],used_cards_indices)
+			print "new deck: {}".format(hands_dict[give_card])
+			
 		else:
 			break
 
@@ -148,9 +185,9 @@ code outline:
 
 [fn] main function to start blackjack game
 
-	[fn] shuffle deck if needed
-	[fn] deal cards
-	[fn] print game board -- showing player's 2 cards and dealer's 2nd card only
+**	[fn] shuffle deck if needed
+**	[fn] deal cards
+**	[fn] print game board -- showing player's 2 cards and dealer's 2nd card only
 	[fn] check if player has 21 to start 
 			- if yes, automatic win (later - draw if both have 21)
 			- if no, continue

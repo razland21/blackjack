@@ -23,50 +23,33 @@ def deal_cards(num_cards, used_cards):
 	
 	return cards
 
-#MAIN GAME
-def play_blackjack():
-
-	used_cards_indices = []
-	hands_dict = {'dealer': [], 'player': []}
 	
-	while True:
-		print "Current Options:"
-		print "1 - deal cards"
-		print "2 - see used cards"
-		print "3 - shuffle cards"
-		print "0 - exit"
-		
-		option = int(raw_input("Enter number: "))
-		
-		if option == 1:
-			num_cards = int(raw_input("How many cards? "))
-			give_cards = raw_input("Who should cards go to? dealer or player ")
-			hands_dict[give_cards] += deal_cards(num_cards, used_cards_indices)
-			print "The current deck is {}".format(hands_dict[give_cards])
-		elif option == 2:
-			print used_cards_indices
-		elif option == 3:
-			shuffle_deck(used_cards_indices)
-		else:
-			break
+def print_board (all_hands, show_dealer_hand):
+	"""
+	Assumptions: if show_dealer_hand is False, then there are only two cards in deck (i.e. want to hide the first card)
+	"""
+	print "***DEALER***"
+	if show_dealer_hand:
+		for card in all_hands['dealer']:
+			print_card(card)
+	else:
+		print "XX",
+		print_card(all_hands['dealer'][1])
 
+	print "\n\n***PLAYER***"
+	for card in all_hands['player']:
+		print_card(card)
+	
+	print "\n"
 
+			
+def print_card (card_tuple):
+	"""
+	Card is represented in tuple as (value, suit)
+	"""
+	print str(card_tuple[0]) + card_tuple[1],
 
-	
-"""	
-[fn] print_board (all_hands, show_dealer_hand)
-	show_dealer_hand: if True, then show all cards in dealer hand.  if False, only show one card (assumes only 2 cards if no).
-	print "DEALER:"
-		if show_dealer_hand = yes:
-			print '[]' + dealer[1]  
-			else:
-			for all cards in deck
-				print card
-	
-	print "PLAYER:"
-		for all cards in deck
-			print card
-	
+"""			
 [fn] check_21 (hand)
 	sum_hand = sum_cards(hand)
 	has_ace = False
@@ -103,7 +86,47 @@ def play_blackjack():
 	
 [fn] check_winner(dealer_hand, player_hand)
 
+"""
 
+
+#MAIN GAME
+def play_blackjack():
+
+	used_cards_indices = []
+	hands_dict = {'dealer': [], 'player': []}
+	
+	while True:
+		print "Current Options:"
+		print "1 - deal cards"
+		print "2 - see used cards"
+		print "3 - shuffle cards"
+		print "4 - show current hand"
+		print "5 - print board"
+		print "0 - exit"
+		
+		option = int(raw_input("Enter number: "))
+		
+		if option == 1:
+			num_cards = int(raw_input("How many cards? "))
+			give_cards = raw_input("Who should cards go to? dealer or player ")
+			hands_dict[give_cards] += deal_cards(num_cards, used_cards_indices)
+			print "The current deck is {}".format(hands_dict[give_cards])
+		elif option == 2:
+			print used_cards_indices
+		elif option == 3:
+			shuffle_deck(used_cards_indices)
+		elif option == 4:
+			show_hand = raw_input("Whose hand do you want to see? dealer or player ")
+			print hands_dict[show_hand]
+		elif option == 5:
+			print_board(hands_dict, True)
+			print_board(hands_dict, False)
+		else:
+			break
+
+			
+play_blackjack()
+"""			
 code outline:
 
 [fn] main function to start blackjack game
@@ -112,8 +135,10 @@ code outline:
 	[fn] deal cards
 	[fn] print game board -- showing player's 2 cards and dealer's 2nd card only
 	[fn] check if player has 21 to start 
-			- if yes, automatic win
+			- if yes, automatic win (later - draw if both have 21)
 			- if no, continue
+	[fn] check if dealer has 21 to start
+			- if yes, automatic lose
 	
 	*** PLAYER GAME LOOP START ***
 	[fn] print gameplay options

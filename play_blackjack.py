@@ -115,6 +115,7 @@ def play_blackjack():
 	used_cards_indices = []
 	hands_dict = {'dealer': [], 'player': []}
 	
+	#start game
 	while True:
 		#check if deck needs shuffling
 		if deck_needs_shuffling(len(used_cards_indices)):
@@ -127,8 +128,26 @@ def play_blackjack():
 		#print board, hide dealer's first card
 		print_board(hands_dict,False)
 		
+		#check if anyone has 21 
+		has_21 = False
+		for person in hands_dict:
+			if check_21(hands_dict[person]):
+				has_21 = True
+				if person == 'dealer':
+					print_board(hands_dict,True)
+					print "Sorry, dealer has 21.  You lose."
+				else:
+					print "{} has Blackjack! You win!".format(person)
+				
+		if has_21:
+			print "someone has 21"
+			break
+		
+		print "game continued"
 		break
-	#play game
+	
+	#end game
+
 	
 	
 
@@ -188,10 +207,10 @@ code outline:
 **	[fn] shuffle deck if needed
 **	[fn] deal cards
 **	[fn] print game board -- showing player's 2 cards and dealer's 2nd card only
-	[fn] check if player has 21 to start 
+**	[fn] check if player has 21 to start 
 			- if yes, automatic win (later - draw if both have 21)
 			- if no, continue
-	[fn] check if dealer has 21 to start
+**	[fn] check if dealer has 21 to start
 			- if yes, automatic lose
 	
 	*** PLAYER GAME LOOP START ***

@@ -1,28 +1,59 @@
+from random import randint
+
 deck = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'),(10,'H'),('J','H'),('Q','H'),('K','H'),
 ('A','D'),(2,'D'),(3,'D'),(4,'D'),(5,'D'),(6,'D'),(7,'D'),(8,'D'),(9,'D'),(10,'D'),('J','D'),('Q','D'),('K','D'),
 ('A','C'),(2,'C'),(3,'C'),(4,'C'),(5,'C'),(6,'C'),(7,'C'),(8,'C'),(9,'C'),(10,'C'),('J','C'),('Q','C'),('K','C'),
 ('A','S'),(2,'S'),(3,'S'),(4,'S'),(5,'S'),(6,'S'),(7,'S'),(8,'S'),(9,'S'),(10,'S'),('J','S'),('Q','S'),('K','S')]
 
-used_cards = []
 
-hands_dict = {dealer: [], player: []}
+def shuffle_deck(used_cards):
+	del used_cards[0:]
+	print "Cards have been shuffled."
+	
 
-
-[fn] shuffle deck
-	clear list of already used cards
-
-[fn] deal_cards (num_cards)
+def deal_cards(num_cards, used_cards):
 	cards = []
-	for number of cards needed:
-		generate random number between 0-51
-		check if number has already been used during this shuffle
-			if yes, generate another number
-			if no, 
-				add number to already used list
-				add corresponding card to cards list
+	
+	while len(cards) < num_cards:
+		new_card_index = randint(0,51)
+		
+		if not new_card_index in used_cards:
+			used_cards.append(new_card_index)
+			cards.append(deck[new_card_index])
+	
 	return cards
+
+#MAIN GAME
+def play_blackjack():
+
+	used_cards_indices = []
+	hands_dict = {'dealer': [], 'player': []}
 	
+	while True:
+		print "Current Options:"
+		print "1 - deal cards"
+		print "2 - see used cards"
+		print "3 - shuffle cards"
+		print "0 - exit"
+		
+		option = int(raw_input("Enter number: "))
+		
+		if option == 1:
+			num_cards = int(raw_input("How many cards? "))
+			give_cards = raw_input("Who should cards go to? dealer or player ")
+			hands_dict[give_cards] += deal_cards(num_cards, used_cards_indices)
+			print "The current deck is {}".format(hands_dict[give_cards])
+		elif option == 2:
+			print used_cards_indices
+		elif option == 3:
+			shuffle_deck(used_cards_indices)
+		else:
+			break
+
+
+
 	
+"""	
 [fn] print_board (all_hands, show_dealer_hand)
 	show_dealer_hand: if True, then show all cards in dealer hand.  if False, only show one card (assumes only 2 cards if no).
 	print "DEALER:"
@@ -117,3 +148,4 @@ code outline:
 	if player already won/lost, then done.  
 	else:
 	[fn] check who has higher number, dealer or winner
+"""

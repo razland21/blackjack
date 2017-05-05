@@ -51,45 +51,51 @@ def print_card(card_tuple):
 
 def	sum_cards(hand):
 	"""
-	Assumption: A = 11.
+	Assumption: A = 11 by default. If multiple Aces in hand, all other Aces count as 1.
 	"""
 	sum_hand = 0
+	added_ace = False
 	
 	for card in hand:
 		if card[0] in ['J', 'Q', 'K']:
 			sum_hand += 10
 		elif card[0] == 'A':
-			sum_hand += 11
+			if added_ace:
+				sum_hand += 1
+			else:
+				added_ace = True
+				sum_hand += 11
 		else:
 			sum_hand += card[0]
 
 	return sum_hand
 
 def check_21(hand):
-	sum_hand = sum_cards(hand)
-	has_ace = False
+	return sum_cards(hand) == 21
+
+	# sum_hand = sum_cards(hand)
+	# has_ace = False
 	
-	#check if Ace is in hand
-	for card in hand:
-		if 'A' in card:
-			has_ace = True
-			break
+	# #check if Ace is in hand
+	# for card in hand:
+		# if 'A' in card:
+			# has_ace = True
+			# break
 	
-	if sum_hand == 21:
-		return True
-	elif has_ace:
-		return (sum_hand - 10) == 21
-	else:
-		return False
+	# if sum_hand == 21:
+		# return True
+	# elif has_ace:
+		# return (sum_hand - 10) == 21
+	# else:
+		# return False
 
 def check_busted(hand):
 	"""
 	Returns True if hand is greater than 21.
+	To fix:
+	-- Need to check for Ace case... if have ace, check sum-10
 	"""
-	if sum_cards(hand) > 21:
-		return True
-	else:
-		return False
+	return sum_cards(hand) > 21
 
 def hit(hand, used_cards):
 	"""

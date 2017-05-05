@@ -49,14 +49,22 @@ def print_board(all_hands, show_dealer_hand):
 	if show_dealer_hand:
 		for card in all_hands['dealer']:
 			print_card(card)
+
+		#line for test only - remove later.
+		#print "\n[CHECK] Dealer Total: {}".format(sum_cards(all_hands['dealer']))
+
 	else:
 		print "XX",
 		print_card(all_hands['dealer'][1])
 
+		
 	print "\n\n***PLAYER***"
 	for card in all_hands['player']:
 		print_card(card)
-	
+
+	#line for test only - remove later.
+	#print "\n[CHECK] Player Total: {}".format(sum_cards(all_hands['player']))
+		
 	print "\n"
 			
 def print_card(card):
@@ -74,10 +82,18 @@ def	sum_cards(hand):
 	- sum_hand: sum of the values of all cards in hand
 	Assumptions: 
 	- A = 11 by default. If multiple Aces in hand, all other Aces count as 1.
+	
+	>>> sum_cards([("A","H"),("A","D"),("A","S"),(10,"H")])
+	13
+	>>> sum_cards([("A","H"),("A","D"),(10,"H")])
+	12
+	>>> sum_cards([("A","H"),(2,"D"),(3,"H"),("A","S")])
+	17
 	"""
 	sum_hand = 0
 	added_ace = False
 	
+	#create initial total
 	for card in hand:
 		if card[0] in ['J', 'Q', 'K']:
 			sum_hand += 10
@@ -90,9 +106,13 @@ def	sum_cards(hand):
 		else:
 			sum_hand += card[0]
 
-	#check for overage caused by Ace
+	#check for overage caused by Ace and adjust
+	if sum_hand > 21:
+		if added_ace:
+			sum_hand -= 10
+		
 	return sum_hand
-
+	
 def check_21(hand):
 	"""
 	Checks whether the given hand has a value of 21.
@@ -101,6 +121,7 @@ def check_21(hand):
 	Returns:
 	- True if value of hand is 21. False otherwise.
 	"""
+	
 	return sum_cards(hand) == 21
 
 def has_ace(hand):
@@ -125,15 +146,8 @@ def check_busted(hand):
 	- True if hand is greater than 21. False otherwise.
 	"""
 	
-	if sum_cards(hand) > 21:
-		#if Ace in hand, check if hand busts for A = 1
-		if has_ace(hand):
-			return (sum_cards(hand) - 10) > 21
-		else:
-			return True
-	else:
-		return False
-	
+	return sum_cards(hand) > 21
+		
 def hit(hand, used_cards):
 	"""
 	Adds one card from the deck into a hand.
@@ -201,7 +215,6 @@ def dealer_must_hit(hand):
 	
 	return sum_cards(hand) < 17
 	
-
 def check_winner(all_hands):
 	"""
 	Checks who won the game.
@@ -221,6 +234,9 @@ def check_winner(all_hands):
 
 #MAIN GAME
 def play_blackjack():
+	"""
+	Main function to run blackjack game.
+	"""
 	player_status = 'playing'
 	
 	#*** GAME START ***
@@ -313,3 +329,11 @@ def play_blackjack():
 #TESTS
 			
 play_blackjack()
+
+#####################################################################
+# Doctest code
+
+# if __name__ == '__main__':
+    # import doctest
+    # if doctest.testmod().failed == 0:
+        # print "\n*** ALL TESTS PASSED. AWESOME WORK!\n"

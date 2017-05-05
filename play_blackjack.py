@@ -406,19 +406,30 @@ def play_blackjack():
 			hands_dict[person] = deal_cards(2,used_cards_indices)
 					
 		#check if anyone has 21 
-		has_21 = False
-		for person in hands_dict:
-			if check_21(hands_dict[person]):
-				has_21 = True
-				print_board(hands_dict,True)
-				if person == 'dealer':
-					print "Sorry, dealer has 21.  You lose."
-					change_total_money('player', calculate_change('player','loss'))
-				else:
-					print "{} has Blackjack! You win!".format(person)
-					change_total_money('player', calculate_change('player','blackjack'))
-				
-		if has_21:
+		dealer_has_21 = check_21(hands_dict['dealer'])
+		player_has_21 = check_21(hands_dict['player'])
+		
+		# for person in hands_dict:
+			# if check_21(hands_dict[person]):
+				# print_board(hands_dict,True)
+				# if person == 'dealer':
+					# dealer_has_21 = True
+				# else:
+					# player_has_21 = True
+		
+		if dealer_has_21 or player_has_21:
+			#single player - assuming game automatically over if one of them have 21, so show dealer hand
+			print_board(hands_dict, True)
+			
+			if dealer_has_21 and player_has_21:
+				print "Both of you have 21.  Draw."
+			elif dealer_has_21:
+				print "Sorry, dealer has 21.  You lose."
+				change_total_money('player', calculate_change('player','loss'))
+			elif player_has_21:
+				print "{} has Blackjack! You win!".format(person)
+				change_total_money('player', calculate_change('player','blackjack'))
+					
 			break
 		
 	#*** PLAYER GAME LOOP START ***

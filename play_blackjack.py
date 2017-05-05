@@ -74,6 +74,32 @@ def print_card(card):
 	"""
 	print str(card[0]) + card[1],
 
+def highest_sum_cards(hand):
+	"""
+	Calculates highest possible sum of cards.  This is to determine how to handle Ace cards in hands. 
+	Arguments:
+	- hand: a list of cards 
+	Returns:
+	- sum_hand: sum of the values of all cards in hand
+	"""
+	
+	sum_hand = 0
+	added_ace = False
+	
+	for card in hand:
+		if card[0] in ['J', 'Q', 'K']:
+			sum_hand += 10
+		elif card[0] == 'A':
+			if added_ace:
+				sum_hand += 1
+			else:
+				added_ace = True
+				sum_hand += 11
+		else:
+			sum_hand += card[0]
+	
+	return sum_hand
+	
 def	sum_cards(hand):
 	"""
 	Arguments:
@@ -90,21 +116,8 @@ def	sum_cards(hand):
 	>>> sum_cards([("A","H"),(2,"D"),(3,"H"),("A","S")])
 	17
 	"""
-	sum_hand = 0
-	added_ace = False
-	
-	#create initial total
-	for card in hand:
-		if card[0] in ['J', 'Q', 'K']:
-			sum_hand += 10
-		elif card[0] == 'A':
-			if added_ace:
-				sum_hand += 1
-			else:
-				added_ace = True
-				sum_hand += 11
-		else:
-			sum_hand += card[0]
+	sum_hand = highest_sum_cards(hand)
+	added_ace = has_ace(hand)
 
 	#check for overage caused by Ace and adjust
 	if sum_hand > 21:
@@ -202,18 +215,33 @@ def valid_move(move):
 	else:
 		return True
 
+def check_soft_17(hand):
+	"""
+	Check if hand is a soft 17 (i.e. hand is 17 because A = 11)
+	"""
+		
 def dealer_must_hit(hand):
 	"""
-	Checks if dealer must hit. Dealer must hit if their total is < 17.
+	Checks if dealer must hit. Dealer must hit if their total is < 17 or if dealer has soft 17.
 	Arguments:
 	- hand: a list of cards representing the hand to add a card to
 	Returns:
 	- True if dealer must hit. False otherwise.
-	Assumptions:
-	- currently, no hitting on soft 17.  change later to check for soft 17.
+	
+	>>> dealer_must_hit([("A","H"),("A","D"),("A","S"),(10,"H")])
+	13
+	>>> sum_cards([("A","H"),("A","D"),(10,"H")])
+	12
+	>>> sum_cards([("A","H"),(2,"D"),(3,"H"),("A","S")])
+	17
+	
 	"""
 	
-	return sum_cards(hand) < 17
+	#check if soft 17, return True
+	if check_soft_17(hand):
+		return True
+	else:
+		return sum_cards(hand) < 17
 	
 def check_winner(all_hands):
 	"""

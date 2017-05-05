@@ -5,9 +5,12 @@ deck = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'
 ('A','C'),(2,'C'),(3,'C'),(4,'C'),(5,'C'),(6,'C'),(7,'C'),(8,'C'),(9,'C'),(10,'C'),('J','C'),('Q','C'),('K','C'),
 ('A','S'),(2,'S'),(3,'S'),(4,'S'),(5,'S'),(6,'S'),(7,'S'),(8,'S'),(9,'S'),(10,'S'),('J','S'),('Q','S'),('K','S')]
 
+#main game data tracking
 used_cards_indices = []
 hands_dict = {'dealer': [], 'player': []}
+rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5,'loss': -1, 'doubling_allowed': [10, 11]}
 
+#betting data tracking
 total_money_dict = {'player': 100}
 bets_dict = {'player': 1}
 
@@ -23,11 +26,11 @@ def check_valid_bet(bet):
 	Assumptions:
 	- bets must be integers greater than 1
 	
-	>>> check_valid_bet("aaa")
-	You must enter an integer greater than 0.
-	False
-	>>> check_valid_bet("1.5")
-	You must enter an integer greater than 0.
+	>>> check_valid_bet("1")
+	True
+	>>> rules['min_bet'] = 2
+	>>> check_valid_bet("1")
+	You must bet at least $2.
 	False
 	>>> check_valid_bet("2")
 	True
@@ -36,8 +39,8 @@ def check_valid_bet(bet):
 	if not bet.isdigit():
 		print "You must enter an integer greater than 0."
 		return False
-	elif int(bet) < 1:
-		print "You must bet at least 1."
+	elif int(bet) < rules['min_bet']:
+		print "You must bet at least ${}.".format(rules['min_bet'])
 		return False
 	else:
 		return True
@@ -88,7 +91,25 @@ def change_total_money(name, amount):
 	total_money_dict[name] += amount
 	print "{} total money: ${}".format(name, total_money_dict[name])
 
-		
+def calculate_change(name, rule):
+	"""
+	Calculates how much the total money of a player should change by based on end result of game.
+	Arguments:
+	- name: string representing the name of the player
+	- rule: string representing the rule to follow (must be a key in 'rules' dictionary)
+	Returns:
+	- total: the amount of money that needs to be added to a player's total.  (negative number means it will be subtracted)
+	"""
+
+	total = 0
+	
+	if rule in rules:
+		total = bets_dict[name] * rules[rule]
+	else:
+		print "{} is an invalid rule. No change will be made to {}'s total".format(rule, name)
+	
+	return total
+	
 #MAIN SUPPORTING FUNCTIONS
 
 def shuffle_deck(used_cards):
@@ -379,8 +400,7 @@ def play_blackjack():
 				else:
 					print "You do not have enough money to make that bet. Your current total is ${}.".format(total_money_dict['player'])
 			
-
-			
+		
 		#deal cards to all people in game
 		for person in hands_dict:
 			hands_dict[person] = deal_cards(2,used_cards_indices)
@@ -393,8 +413,10 @@ def play_blackjack():
 				print_board(hands_dict,True)
 				if person == 'dealer':
 					print "Sorry, dealer has 21.  You lose."
+					change_total_money('player', calculate_change('player','loss'))
 				else:
 					print "{} has Blackjack! You win!".format(person)
+					change_total_money('player', calculate_change('player','blackjack'))
 				
 		if has_21:
 			break

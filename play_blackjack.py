@@ -218,7 +218,19 @@ def valid_move(move):
 def check_soft_17(hand):
 	"""
 	Check if hand is a soft 17 (i.e. hand is 17 because A = 11)
+	>>> check_soft_17([(2,"H"),("A","D"),("A","S"),(10,"H")])
+	False
+	>>> check_soft_17([("A","H"),("A","D"),(5,"H")])
+	True
+	>>> check_soft_17([("A","H"),(2,"D"),(3,"H"),("A","S")])
+	True
+	>>> check_soft_17([("A","H"),(4,"H"),("A","S"),("A","C")])
+	True
+	>>> check_soft_17([("A","H"),(3,"H"),("A","S"),("A","C")])
+	False
 	"""
+	
+	return highest_sum_cards(hand) == 17 and has_ace(hand)
 		
 def dealer_must_hit(hand):
 	"""
@@ -228,13 +240,12 @@ def dealer_must_hit(hand):
 	Returns:
 	- True if dealer must hit. False otherwise.
 	
-	>>> dealer_must_hit([("A","H"),("A","D"),("A","S"),(10,"H")])
-	13
-	>>> sum_cards([("A","H"),("A","D"),(10,"H")])
-	12
-	>>> sum_cards([("A","H"),(2,"D"),(3,"H"),("A","S")])
-	17
-	
+	>>> dealer_must_hit([("A","H"),(4,"H"),("A","S"),("A","C")])
+	True
+	>>> dealer_must_hit([("A","H"),(3,"H"),("A","S"),("A","C")])
+	True
+	>>> dealer_must_hit([(5,"H"),("A","D"),("A","S"),(10,"H")])
+	False
 	"""
 	
 	#check if soft 17, return True

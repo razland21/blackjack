@@ -10,10 +10,22 @@ hands_dict = {'dealer': [], 'player': []}
 
 
 def shuffle_deck(used_cards):
+	"""
+	Arguments: 
+	- used_cards: a list of indices representing cards already used in deck
+	"""
 	del used_cards[0:]
 	print "Cards have been shuffled."
 	
 def deal_cards(num_cards, used_cards):
+	"""
+	Arguments: 
+	- num_cards: an int representing the number of cards to deal
+	- used_cards: a list of indices representing cards already used in deck
+	
+	Returns:
+	- cards: a list of cards representing new cards to be added to a hand
+	"""
 	cards = []
 	
 	while len(cards) < num_cards:
@@ -27,9 +39,13 @@ def deal_cards(num_cards, used_cards):
 	
 def print_board(all_hands, show_dealer_hand):
 	"""
-	Assumption: if show_dealer_hand is False, then there are only two cards in deck (i.e. want to hide the first card)
+	Arguments:
+	- all_hands: a dictionary representing all hands in current game
+	- show_dealer_hand: a boolean representing whether to show or hide the dealer's first card. True = show card.
+	Assumptions: 
+	- If show_dealer_hand is False, then there are only two cards in deck (i.e. want to hide the first card)
 	"""
-	print "***DEALER***"
+	print "\n***DEALER***"
 	if show_dealer_hand:
 		for card in all_hands['dealer']:
 			print_card(card)
@@ -43,15 +59,21 @@ def print_board(all_hands, show_dealer_hand):
 	
 	print "\n"
 			
-def print_card(card_tuple):
+def print_card(card):
 	"""
-	Card is represented in tuple as (value, suit)
+	Arguments:
+	- card: a tuple representing a card. Cards are represented in tuples as (value, suit)
 	"""
-	print str(card_tuple[0]) + card_tuple[1],
+	print str(card[0]) + card[1],
 
 def	sum_cards(hand):
 	"""
-	Assumption: A = 11 by default. If multiple Aces in hand, all other Aces count as 1.
+	Arguments:
+	- hand: a list of cards 
+	Returns:
+	- sum_hand: sum of the values of all cards in hand
+	Assumptions: 
+	- A = 11 by default. If multiple Aces in hand, all other Aces count as 1.
 	"""
 	sum_hand = 0
 	added_ace = False
@@ -68,53 +90,92 @@ def	sum_cards(hand):
 		else:
 			sum_hand += card[0]
 
+	#check for overage caused by Ace
 	return sum_hand
 
 def check_21(hand):
+	"""
+	Checks whether the given hand has a value of 21.
+	Arguments:
+	- hand: a list of cards 
+	Returns:
+	- True if value of hand is 21. False otherwise.
+	"""
 	return sum_cards(hand) == 21
 
-	# sum_hand = sum_cards(hand)
-	# has_ace = False
-	
-	# #check if Ace is in hand
-	# for card in hand:
-		# if 'A' in card:
-			# has_ace = True
-			# break
-	
-	# if sum_hand == 21:
-		# return True
-	# elif has_ace:
-		# return (sum_hand - 10) == 21
-	# else:
-		# return False
+def has_ace(hand):
+	"""
+	Arguments:
+	- hand: a list of cards 
+	Returns:
+	- True if at least one Ace card exists in the hand. False otherwise.
+	"""
+	for card in hand:
+		if 'A' in card:
+			return True
+			
+	return False
 
 def check_busted(hand):
 	"""
-	Returns True if hand is greater than 21.
-	To fix:
-	-- Need to check for Ace case... if have ace, check sum-10
+	Checks if value of hand is greater than 21.
+	Arguments:
+	- hand: a list of cards 
+	Returns:
+	- True if hand is greater than 21. False otherwise.
 	"""
-	return sum_cards(hand) > 21
-
+	
+	if sum_cards(hand) > 21:
+		#if Ace in hand, check if hand busts for A = 1
+		if has_ace(hand):
+			return (sum_cards(hand) - 10) > 21
+		else:
+			return True
+	else:
+		return False
+	
 def hit(hand, used_cards):
 	"""
-	deal_cards returns a list of one card - need to append the card itself to the hand
+	Adds one card from the deck into a hand.
+	Arguments:
+	- hand: a list of cards representing the hand to add a card to
+	- used_cards: a list of indices representing cards already used in deck
+	Notes:
+	- deal_cards() returns a list of one card - [0] is added to append the card itself to the hand
 	"""
+	
 	hand.append(deal_cards(1,used_cards)[0])
 
 def deck_needs_shuffling(num_cards_used):
 	"""
-	Assumption: deck needs to be shuffled if there are <12 cards remaining.  (this can change later with more players)
+	Checks whether the deck needs to be shuffled based on current assumptions.
+	Arguments:
+	- num_cards_used: an int representing the number of cards already used
+	Returns:
+	- True if the deck needs to be shuffled.  False otherwise.
+	Assumptions: 
+	- deck needs to be shuffled if there are <12 cards remaining.  (this can change later with more players)
 	"""
+	
 	return num_cards_used > 40
 	
 def print_options():
+	"""
+	Prints player's options.
+	"""
 	print "Choose from the following options:"
 	print "    1 - Hit"
 	print "    2 - Stand"
 
 def valid_move(move):
+	"""
+	Checks whether user input represents a valid move
+	Arguments:
+	- move: string representing a move.
+	Returns:
+	- True if move is valid. False otherwise.
+	"""
+	
 	if len(move) == 0:
 		print "You have to put something."
 		return False
@@ -129,19 +190,33 @@ def valid_move(move):
 
 def dealer_must_hit(hand):
 	"""
-	Dealer must hit if their total is < 17.  
+	Checks if dealer must hit. Dealer must hit if their total is < 17.
+	Arguments:
+	- hand: a list of cards representing the hand to add a card to
+	Returns:
+	- True if dealer must hit. False otherwise.
 	Assumptions:
 	- currently, no hitting on soft 17.  change later to check for soft 17.
-	Things to fix:
-	- need to check for multiple aces (across all relevant functions)
 	"""
+	
 	return sum_cards(hand) < 17
 	
-	
-"""	
-[fn] check_winner(dealer_hand, player_hand)
 
-"""
+def check_winner(all_hands):
+	"""
+	Checks who won the game.
+	Arguments:
+	- all_hands: a dictionary representing all hands in current game
+	"""
+	
+	if check_busted(all_hands['dealer']):				
+		print "Dealer busted! Player wins!"
+	elif sum_cards(all_hands['player']) > sum_cards(all_hands['dealer']):
+		print "Congratulations, player wins!"
+	elif sum_cards(all_hands['player']) == sum_cards(all_hands['dealer']):
+		print "Draw."
+	else:
+		print "Sorry, dealer won."
 
 
 #MAIN GAME
@@ -150,11 +225,7 @@ def play_blackjack():
 	
 	#*** GAME START ***
 	while True:
-	
-		#TEST LINES - REMOVE LATER
-		print "# used cards: {}".format(len(used_cards_indices))
-		print "deck needs shuffling: {}".format(deck_needs_shuffling(len(used_cards_indices)))
-		
+			
 		#check if deck needs shuffling
 		if deck_needs_shuffling(len(used_cards_indices)):
 			shuffle_deck(used_cards_indices)
@@ -177,7 +248,7 @@ def play_blackjack():
 		if has_21:
 			break
 		
-		#*** PLAYER GAME LOOP START ***
+	#*** PLAYER GAME LOOP START ***
 		
 		while True:
 			print_board(hands_dict, False)
@@ -206,7 +277,8 @@ def play_blackjack():
 				print "\nPlayer stands. Turn is over."
 				break
 			
-		#*** DEALER GAME LOOP START ***	
+	#*** DEALER GAME LOOP START ***	
+		
 		if player_status != 'lost':
 			print "Dealer's Turn\n"
 			
@@ -219,29 +291,19 @@ def play_blackjack():
 			
 			else:
 				print_board(hands_dict, True)
-				
-				if check_busted(hands_dict['dealer']):				
-					print "Dealer busted!  Player wins!"
-					break
-				elif sum_cards(hands_dict['player']) > sum_cards(hands_dict['dealer']):
-					print "Congratulations, you win!"
-				elif sum_cards(hands_dict['player']) == sum_cards(hands_dict['dealer']):
-					print "Draw"
-				else:
-					print "Sorry, dealer won."
+				check_winner(hands_dict)				
 				break
-		
 		break
 	
 	#end game - prompt to replay
 	while True:
-		replay = raw_input("Do you want to play again?  Type 'yes' or 'no': ").strip().lower()
+		replay = raw_input("\nDo you want to play again?  Type 'yes' or 'no': ").strip().lower()
 		if replay == "yes":
-			print "Alright, let's play again!"
+			print "Alright, let's play again!\n"
 			play_blackjack()
 			break
 		elif replay == "no":
-			print "Thanks for playing!"
+			print "Thanks for playing!\n"
 			break 
 		else:
 			print "Sorry, I'm not sure what you mean by {}.".format(replay)
@@ -249,99 +311,5 @@ def play_blackjack():
 	
 
 #TESTS
-def tests():
-
-	used_cards_indices = []
-	hands_dict = {'dealer': [], 'player': []}
-	
-	while True:
-		print "Current Options:"
-		print "1 - deal cards"
-		print "2 - see used cards"
-		print "3 - shuffle cards"
-		print "4 - show current hand"
-		print "5 - print board"
-		print "6 - sum hand"
-		print "7 - hit"
-		print "0 - exit"
-		
-		option = int(raw_input("Enter number: "))
-		
-		if option == 1:
-			num_cards = int(raw_input("How many cards? "))
-			give_cards = raw_input("Who should cards go to? dealer or player ")
-			hands_dict[give_cards] += deal_cards(num_cards, used_cards_indices)
-			print "The current deck is {}".format(hands_dict[give_cards])
-		elif option == 2:
-			print used_cards_indices
-		elif option == 3:
-			shuffle_deck(used_cards_indices)
-		elif option == 4:
-			show_hand = raw_input("Whose hand do you want to see? dealer or player ")
-			print hands_dict[show_hand]
-		elif option == 5:
-			print_board(hands_dict, True)
-			print_board(hands_dict, False)
-		elif option == 6:
-			sum_hand = raw_input("Whose hand do you want to add? dealer or player ")
-			print sum_cards(hands_dict[sum_hand])
-		elif option == 7:
-			give_card = raw_input("Who should card go to? dealer or player ")
-			print "old deck: {}".format(hands_dict[give_card])
-			hit(hands_dict[give_card],used_cards_indices)
-			print "new deck: {}".format(hands_dict[give_card])
-			
-		else:
-			break
-
 			
 play_blackjack()
-
-"""			
-code outline:
-
-[fn] main function to start blackjack game
-
-**	[fn] shuffle deck if needed
-**	[fn] deal cards
-**	[fn] print game board -- showing player's 2 cards and dealer's 2nd card only
-**	[fn] check if player has 21 to start 
-			- if yes, automatic win (later - draw if both have 21)
-			- if no, continue
-**	[fn] check if dealer has 21 to start
-			- if yes, automatic lose
-	
-	*** PLAYER GAME LOOP START ***
-**	[fn] print gameplay options
-			- hit
-			- stand
-			[more later]
-**	ask player to choose option
-	
-**	if player chooses hit, give player another card.
-**		[fn] hit
-**		[*fn] print game board -- showing new card added to player's hand
-**		[*fn] check if player has 21 -- if yes, turn is over (not automatic win)
-**		[fn] check if player is over 21 -- if yes, automatic lose
-	
-**	if player chooses stand, player turn ends.
-	
-	*** PLAYER GAME LOOP END ***
-	
-	*** DEALER GAME LOOP START ***
-	[*fn] print game board -- show both of dealer's cards  [print game board needs to take y/n argument for showing dealer's other card]
---			- if player has already lost, end here.
-			
-	[*fn] check if dealer is busted -- if yes, turn is over, player automatically wins
-	[*fn] check if dealer has 17 
-		- if yes, dealer's turn is over (not automatic win)
-		- if no, hit again
-	
-	
-	*** DEALER GAME LOOP END ***
-			
-	*** CHECK FOR WINNER ***
-	if player already won/lost, then done.  
-	else:
-	[fn] check who has higher number, dealer or winner
-"""

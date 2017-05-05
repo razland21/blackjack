@@ -1,3 +1,67 @@
+	
+MVP
++ single player: 1 player vs AI
++ main game loop
++ dealer stops at 17 (including soft 17)
++ no betting
+
+Backlog
+- betting
+- allow for doubling down on 10/11
+- allow for splitting pairs
+- multiple players
+- option to use multiple decks
+- insurance if dealer is showing A
+- main menu
+- change settings for rules
+- player(s) can input their own name
+
+----------------------------------------------------------------------------------------------
+***RULES DICTIONARY***
+min_bet: 1
+win_mult: 1
+blackjack_mult: 1.5
+lose_mult: -1
+doubling_allowed: [10, 11]
+
+----------------------------------------------------------------------------------------------
+***BETTING PSEUDOCODE***
+
+Things to Track:
+	- how much currency a player has
+	- amount bet for current game
+	
+
+Assumptions:
+	- minimum bet: 1
+	- bets can only be ints  (TBD if floats will be supported later)
+	- each game starts with $100.
+
+
+Betting Rules:
+	- if player gets blackjack, they earn 1.5x their bet
+	- draw = no money lost
+
+
+Code Outline:
+
+ask for bet
+[fn] check if valid bet
+[fn] check if player has enough to make that bet
+	- if yes, continue
+	- if no, ask for bet again
+
+[game play]
+
+if win, [fn] add amount that player bet to their total
+if lost, [fn] subtract amount that player bet from their total
+--> assumes total will never be < 0
+else, do nothing (draw)
+
+
+----------------------------------------------------------------------------------------------
+***MVP PSEUDOCODE***
+
 notation:
 [fn] - function to write
 [*fn] - function already exists in outline
@@ -124,19 +188,4 @@ individual functions:
 	
 [fn] check_winner(dealer_hand, player_hand)
 
-	
-MVP
-- single player: 1 player vs AI
-- main game loop
-- dealer stops at 17 (including soft 17? TBD)
-- no betting
-
-Backlog
-- betting
-- allow for doubling down on 10/11
-- allow for splitting pairs
-- multiple players
-- option to use multiple decks
-- insurance if dealer is showing A
-- main menu
-- change settings for rules
+----------------------------------------------------------------------------------------------

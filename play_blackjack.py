@@ -8,6 +8,41 @@ deck = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'
 used_cards_indices = []
 hands_dict = {'dealer': [], 'player': []}
 
+total_money_dict = {'player': 100}
+bets_dict = {'player': 1}
+
+#BETTING
+
+def check_valid_bet(bet):
+	"""
+	Checks whether user input represents a valid bet
+	Arguments:
+	- move: string representing a bet.
+	Returns:
+	- True if bet is valid. False otherwise.
+	Assumptions:
+	- bets must be integers greater than 1
+	
+	>>> check_valid_bet("aaa")
+	You must enter an integer greater than 0.
+	False
+	>>> check_valid_bet("1.5")
+	You must enter an integer greater than 0.
+	False
+	>>> check_valid_bet("2")
+	True
+	"""
+
+	if not bet.isdigit():
+		print "You must enter an integer greater than 0."
+		return False
+	elif int(bet) < 1:
+		print "You must bet at least 1."
+		return False
+	else:
+		return True
+
+#MAIN SUPPORTING FUNCTIONS
 
 def shuffle_deck(used_cards):
 	"""
@@ -194,7 +229,7 @@ def print_options():
 	print "    1 - Hit"
 	print "    2 - Stand"
 
-def valid_move(move):
+def check_valid_move(move):
 	"""
 	Checks whether user input represents a valid move
 	Arguments:
@@ -312,7 +347,7 @@ def play_blackjack():
 			move = raw_input("Enter the number for the move you want to make: ").strip()
 			
 			#if move is not valid, start loop over
-			if not valid_move(move):
+			if not check_valid_move(move):
 				continue
 		
 			if move == "1":
@@ -367,12 +402,12 @@ def play_blackjack():
 
 #TESTS
 			
-play_blackjack()
+#play_blackjack()
 
 #####################################################################
 # Doctest code
 
-# if __name__ == '__main__':
-    # import doctest
-    # if doctest.testmod().failed == 0:
-        # print "\n*** ALL TESTS PASSED. AWESOME WORK!\n"
+if __name__ == '__main__':
+    import doctest
+    if doctest.testmod().failed == 0:
+        print "\n*** ALL TESTS PASSED. AWESOME WORK!\n"

@@ -42,6 +42,53 @@ def check_valid_bet(bet):
 	else:
 		return True
 
+def check_funding(name, bet):
+	"""
+	Checks whether player can afford placing the bet
+	Arguments:
+	- name: string representing the name of the player
+	- bet: int representing amount player wants to bet
+	Returns:
+	- True if bet can be made. False otherwise.
+	"""
+	
+	return total_money_dict[name] >= bet
+
+def set_bet(name, bet):
+	"""
+	Sets bet for player.
+	Arguments:
+	- name: string representing the name of the player
+	- bet: int representing amount player wants to bet
+	>>> print bets_dict['player']
+	1
+	>>> set_bet('player', 5)
+	player has bet 5 in this round.
+	>>> print bets_dict['player']
+	5
+	"""
+	
+	bets_dict[name] = bet
+	print "{} has bet {} in this round.".format(name,bet)
+	
+def change_total_money(name, amount):
+	"""
+	Changes total money available for player.
+	Arguments:
+	- name: string representing the name of the player
+	- amount: a float representing the amount that the player's total should change by
+	>>> print total_money_dict['player']
+	100
+	>>> change_total_money('player', 50)
+	player total money: $150
+	>>> change_total_money('player', -25)
+	player total money: $125
+	"""
+	
+	total_money_dict[name] += amount
+	print "{} total money: ${}".format(name, total_money_dict[name])
+
+		
 #MAIN SUPPORTING FUNCTIONS
 
 def shuffle_deck(used_cards):

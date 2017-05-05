@@ -63,13 +63,13 @@ def set_bet(name, bet):
 	>>> print bets_dict['player']
 	1
 	>>> set_bet('player', 5)
-	player has bet 5 in this round.
+	Player has bet $5 in this round.
 	>>> print bets_dict['player']
 	5
 	"""
 	
 	bets_dict[name] = bet
-	print "{} has bet {} in this round.".format(name,bet)
+	print "{} has bet ${} in this round.".format(name.title(),bet)
 	
 def change_total_money(name, amount):
 	"""
@@ -367,6 +367,20 @@ def play_blackjack():
 		if deck_needs_shuffling(len(used_cards_indices)):
 			shuffle_deck(used_cards_indices)
 		
+		#betting loop: ask for bet/check validity/set bet		
+		while True:
+			bet = raw_input("Enter the amount you want to bet. Bet must be an integer greater than 0: ").strip()
+
+			if check_valid_bet(bet):
+				bet = int(bet)
+				if check_funding('player', bet):
+					set_bet('player', bet)
+					break
+				else:
+					print "You do not have enough money to make that bet. Your current total is ${}.".format(total_money_dict['player'])
+			
+
+			
 		#deal cards to all people in game
 		for person in hands_dict:
 			hands_dict[person] = deal_cards(2,used_cards_indices)

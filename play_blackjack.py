@@ -5,6 +5,9 @@ deck = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'
 ('A','C'),(2,'C'),(3,'C'),(4,'C'),(5,'C'),(6,'C'),(7,'C'),(8,'C'),(9,'C'),(10,'C'),('J','C'),('Q','C'),('K','C'),
 ('A','S'),(2,'S'),(3,'S'),(4,'S'),(5,'S'),(6,'S'),(7,'S'),(8,'S'),(9,'S'),(10,'S'),('J','S'),('Q','S'),('K','S')]
 
+used_cards_indices = []
+hands_dict = {'dealer': [], 'player': []}
+
 
 def shuffle_deck(used_cards):
 	del used_cards[0:]
@@ -102,8 +105,8 @@ def deck_needs_shuffling(num_cards_used):
 	
 def print_options():
 	print "Choose from the following options:"
-	print "1 - Hit"
-	print "2 - Stand"
+	print "    1 - Hit"
+	print "    2 - Stand"
 
 def valid_move(move):
 	if len(move) == 0:
@@ -117,7 +120,18 @@ def valid_move(move):
 		return False
 	else:
 		return True
-		
+
+def dealer_must_hit(hand):
+	"""
+	Dealer must hit if their total is < 17.  
+	Assumptions:
+	- currently, no hitting on soft 17.  change later to check for soft 17.
+	Things to fix:
+	- need to check for multiple aces (across all relevant functions)
+	"""
+	return sum_cards(hand) < 17
+	
+	
 """	
 [fn] check_winner(dealer_hand, player_hand)
 
@@ -126,11 +140,15 @@ def valid_move(move):
 
 #MAIN GAME
 def play_blackjack():
-	used_cards_indices = []
-	hands_dict = {'dealer': [], 'player': []}
+	player_status = 'playing'
 	
 	#*** GAME START ***
 	while True:
+	
+		#TEST LINES - REMOVE LATER
+		print "# used cards: {}".format(len(used_cards_indices))
+		print "deck needs shuffling: {}".format(deck_needs_shuffling(len(used_cards_indices)))
+		
 		#check if deck needs shuffling
 		if deck_needs_shuffling(len(used_cards_indices)):
 			shuffle_deck(used_cards_indices)
@@ -144,15 +162,13 @@ def play_blackjack():
 		for person in hands_dict:
 			if check_21(hands_dict[person]):
 				has_21 = True
+				print_board(hands_dict,True)
 				if person == 'dealer':
-					print_board(hands_dict,True)
 					print "Sorry, dealer has 21.  You lose."
 				else:
-					print_board(hands_dict,True) 	#CHANGE IF MULTIPLE PEOPLE
 					print "{} has Blackjack! You win!".format(person)
 				
 		if has_21:
-			print "someone has 21"  #REMOVE LATER
 			break
 		
 		#*** PLAYER GAME LOOP START ***
@@ -173,23 +189,47 @@ def play_blackjack():
 				if check_busted(hands_dict['player']):
 					print_board(hands_dict, True)
 					print "Busted! You lose."
+					player_status = 'lost'
 					break
 				elif check_21(hands_dict['player']):
 					print_board(hands_dict, False)
 					print "You have 21. Turn is over."
-				
+					break
 				
 			elif move == "2":
-				print "\nPlayer stands.  Turn is over."
+				print "\nPlayer stands. Turn is over."
 				break
 			
+		#*** DEALER GAME LOOP START ***	
+		if player_status != 'lost':
+			print "Dealer's Turn\n"
 			
-		print "game continued" #REMOVE LATER
+		while True:
+			if player_status == 'lost':
+				break
+			
+			if dealer_must_hit(hands_dict['dealer']):
+				hit(hands_dict['dealer'], used_cards_indices)
+			
+			else:
+				print_board(hands_dict, True)
+				
+				if check_busted(hands_dict['dealer']):				
+					print "Dealer busted!  Player wins!"
+					break
+				elif sum_cards(hands_dict['player']) > sum_cards(hands_dict['dealer']):
+					print "Congratulations, you win!"
+				elif sum_cards(hands_dict['player']) == sum_cards(hands_dict['dealer']):
+					print "Draw"
+				else:
+					print "Sorry, dealer won."
+				break
+		
 		break
 	
 	#end game - prompt to replay
 	while True:
-		replay = raw_input("Do you want to play again?  Type 'yes' or 'no'.: ").strip().lower()
+		replay = raw_input("Do you want to play again?  Type 'yes' or 'no': ").strip().lower()
 		if replay == "yes":
 			print "Alright, let's play again!"
 			play_blackjack()
@@ -249,7 +289,8 @@ def tests():
 			break
 
 			
-#play_blackjack()
+play_blackjack()
+
 """			
 code outline:
 
@@ -274,16 +315,16 @@ code outline:
 **	if player chooses hit, give player another card.
 **		[fn] hit
 **		[*fn] print game board -- showing new card added to player's hand
-		[*fn] check if player has 21 -- if yes, turn is over (not automatic win)
+**		[*fn] check if player has 21 -- if yes, turn is over (not automatic win)
 **		[fn] check if player is over 21 -- if yes, automatic lose
 	
-	if player chooses stand, player turn ends.
+**	if player chooses stand, player turn ends.
 	
 	*** PLAYER GAME LOOP END ***
 	
 	*** DEALER GAME LOOP START ***
 	[*fn] print game board -- show both of dealer's cards  [print game board needs to take y/n argument for showing dealer's other card]
-			- if player has already lost, end here.
+--			- if player has already lost, end here.
 			
 	[*fn] check if dealer is busted -- if yes, turn is over, player automatically wins
 	[*fn] check if dealer has 17 

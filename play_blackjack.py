@@ -83,7 +83,7 @@ def set_bet(name, bet):
 	
 def change_total_money(name, amount):
 	"""
-	Changes total money available for player.
+	Changes total money available for player by given amount.
 	Arguments:
 	- name: string representing the name of the player
 	- amount: a float representing the amount that the player's total should change by
@@ -97,7 +97,7 @@ def change_total_money(name, amount):
 	
 	print "\n{}'s previous total money: ${}".format(name.title(), total_money_dict[name])
 	total_money_dict[name] += amount
-	print "{}'s total money: ${}".format(name.title(), total_money_dict[name])
+	print "{}'s total money: ${}\n".format(name.title(), total_money_dict[name])
 
 def calculate_change(name, rule):
 	"""
@@ -117,7 +117,10 @@ def calculate_change(name, rule):
 		print "{} is an invalid rule. No change will be made to {}'s total".format(rule, name)
 	
 	return total
-	
+
+
+
+
 #MAIN SUPPORTING FUNCTIONS
 
 def shuffle_deck(used_cards):
@@ -396,6 +399,11 @@ def play_blackjack():
 		print "WELCOME TO BLACKJACK! Minimum bet is ${}.".format(rules['min_bet'])
 		print "Player's total money: ${}\n".format(total_money_dict['player'])
 		
+		#check if player has money
+		if total_money_dict['player'] < 1:
+			print "Oh no, you're broke! Let's fix that!"
+			change_total_money('player', 100)
+			
 		#check if deck needs shuffling
 		if deck_needs_shuffling(len(used_cards_indices)):
 			shuffle_deck(used_cards_indices)
@@ -493,7 +501,7 @@ def play_blackjack():
 	
 	#end game - prompt to replay
 	while True:
-		replay = raw_input("\nDo you want to play again?  Type 'yes' or 'no': ").strip().lower()
+		replay = raw_input("Do you want to play again?  Type 'yes' or 'no': ").strip().lower()
 		if replay == "yes":
 			print "Alright, let's play again!\n"
 			play_blackjack()

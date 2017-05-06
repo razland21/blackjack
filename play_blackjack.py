@@ -393,7 +393,7 @@ def play_blackjack():
 	
 	#*** GAME START ***
 	while True:
-		print "WELCOME TO BLACKJACK! Minimum bet is {}.".format(rules['min_bet'])
+		print "WELCOME TO BLACKJACK! Minimum bet is ${}.".format(rules['min_bet'])
 		print "Player's total money: ${}\n".format(total_money_dict['player'])
 		
 		#check if deck needs shuffling
@@ -402,7 +402,7 @@ def play_blackjack():
 		
 		#betting loop: ask for bet/check validity/set bet		
 		while True:
-			bet = raw_input("Enter the amount you want to bet.: ").strip()
+			bet = raw_input("Enter the amount you want to bet: ").strip()
 
 			if check_valid_bet(bet):
 				bet = int(bet)

@@ -8,7 +8,14 @@ deck = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'
 #main game data tracking
 used_cards_indices = []
 hands_dict = {'dealer': [], 'player': []}
-rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5,'loss': -1, 'doubling_allowed': [10, 11]}
+
+#rules
+#min_bet: int value
+#win/blackjack/loss: multipliers
+#doubling_allowed: list of cards where doubling down is allowed
+#shuffle: min number of cards already used before shuffling has to happen
+
+rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed': [10, 11], 'shuffle': 40}
 
 #betting data tracking
 total_money_dict = {'player': 100}
@@ -83,13 +90,14 @@ def change_total_money(name, amount):
 	>>> print total_money_dict['player']
 	100
 	>>> change_total_money('player', 50)
-	player total money: $150
+	Player's total money: $150
 	>>> change_total_money('player', -25)
-	player total money: $125
+	Player's total money: $125
 	"""
 	
+	print "\n{}'s previous total money: ${}".format(name.title(), total_money_dict[name])
 	total_money_dict[name] += amount
-	print "{} total money: ${}".format(name, total_money_dict[name])
+	print "{}'s total money: ${}".format(name.title(), total_money_dict[name])
 
 def calculate_change(name, rule):
 	"""
@@ -118,7 +126,7 @@ def shuffle_deck(used_cards):
 	- used_cards: a list of indices representing cards already used in deck
 	"""
 	del used_cards[0:]
-	print "Cards have been shuffled."
+	print "Cards have been shuffled.\n"
 	
 def deal_cards(num_cards, used_cards):
 	"""
@@ -278,16 +286,14 @@ def hit(hand, used_cards):
 
 def deck_needs_shuffling(num_cards_used):
 	"""
-	Checks whether the deck needs to be shuffled based on current assumptions.
+	Checks whether the deck needs to be shuffled based on current rule in rules['shuffle'].
 	Arguments:
 	- num_cards_used: an int representing the number of cards already used
 	Returns:
 	- True if the deck needs to be shuffled.  False otherwise.
-	Assumptions: 
-	- deck needs to be shuffled if there are <12 cards remaining.  (this can change later with more players)
 	"""
 	
-	return num_cards_used > 40
+	return num_cards_used > rules['shuffle']
 	
 def print_options():
 	"""
@@ -364,14 +370,18 @@ def check_winner(all_hands):
 	- all_hands: a dictionary representing all hands in current game
 	"""
 	
-	if check_busted(all_hands['dealer']):				
-		print "Dealer busted! Player wins!"
-	elif sum_cards(all_hands['player']) > sum_cards(all_hands['dealer']):
-		print "Congratulations, player wins!"
+	if sum_cards(all_hands['player']) < sum_cards(all_hands['dealer']) and not check_busted(all_hands['dealer']):
+		print "Sorry, dealer won."
+		change_total_money('player', calculate_change('player', 'loss'))
 	elif sum_cards(all_hands['player']) == sum_cards(all_hands['dealer']):
 		print "Draw."
 	else:
-		print "Sorry, dealer won."
+		if check_busted(all_hands['dealer']):				
+			print "Dealer busted! Player wins!"
+		elif sum_cards(all_hands['player']) > sum_cards(all_hands['dealer']):
+			print "Congratulations, player wins!"
+		change_total_money('player', calculate_change('player', 'win'))
+
 
 
 #MAIN GAME
@@ -383,14 +393,16 @@ def play_blackjack():
 	
 	#*** GAME START ***
 	while True:
-			
+		print "WELCOME TO BLACKJACK! Minimum bet is {}.".format(rules['min_bet'])
+		print "Player's total money: ${}\n".format(total_money_dict['player'])
+		
 		#check if deck needs shuffling
 		if deck_needs_shuffling(len(used_cards_indices)):
 			shuffle_deck(used_cards_indices)
 		
 		#betting loop: ask for bet/check validity/set bet		
 		while True:
-			bet = raw_input("Enter the amount you want to bet. Bet must be an integer greater than 0: ").strip()
+			bet = raw_input("Enter the amount you want to bet.: ").strip()
 
 			if check_valid_bet(bet):
 				bet = int(bet)
@@ -399,7 +411,6 @@ def play_blackjack():
 					break
 				else:
 					print "You do not have enough money to make that bet. Your current total is ${}.".format(total_money_dict['player'])
-			
 		
 		#deal cards to all people in game
 		for person in hands_dict:
@@ -427,7 +438,7 @@ def play_blackjack():
 				print "Sorry, dealer has 21.  You lose."
 				change_total_money('player', calculate_change('player','loss'))
 			elif player_has_21:
-				print "{} has Blackjack! You win!".format(person)
+				print "Player has Blackjack! You win!"
 				change_total_money('player', calculate_change('player','blackjack'))
 					
 			break
@@ -450,6 +461,7 @@ def play_blackjack():
 				if check_busted(hands_dict['player']):
 					print_board(hands_dict, True)
 					print "Busted! You lose."
+					change_total_money('player', calculate_change('player','loss'))
 					player_status = 'lost'
 					break
 				elif check_21(hands_dict['player']):
@@ -496,12 +508,12 @@ def play_blackjack():
 
 #TESTS
 			
-#play_blackjack()
+play_blackjack()
 
 #####################################################################
 # Doctest code
 
-if __name__ == '__main__':
-    import doctest
-    if doctest.testmod().failed == 0:
-        print "\n*** ALL TESTS PASSED. AWESOME WORK!\n"
+# if __name__ == '__main__':
+    # import doctest
+    # if doctest.testmod().failed == 0:
+        # print "\n*** ALL TESTS PASSED. AWESOME WORK!\n"

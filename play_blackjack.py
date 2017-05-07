@@ -148,26 +148,20 @@ def print_board(all_players, show_dealer_hand):
 	Arguments:
 	- all_players: a dictionary representing all players in current game
 	- show_dealer_hand: a boolean representing whether to show or hide the dealer's first card. True = show card.
-	Assumptions: 
-	- If show_dealer_hand is False, then there are only two cards in deck (i.e. want to hide the first card)
 	"""
 	print "\n***DEALER***"
 	if show_dealer_hand:
-		for card in all_players['dealer']['hand']:
-			print_card(card)
-
-		print "\n\nDealer Total: {}".format(sum_cards('dealer'))
+		print_hand('dealer')
+		print "\nDealer Total: {}".format(sum_cards('dealer'))
 
 	else:
-		print "XX",
-		print_card(all_players['dealer']['hand'][1])
+		print_hand('dealer', False)
 
 		
 	print "\n\n***PLAYER***"
-	for card in all_players['player']['hand']:
-		print_card(card)
+	print_hand('player')
 
-	print "\n\nPlayer Total: {}\n".format(sum_cards('player'))
+	print "\nPlayer Total: {}\n".format(sum_cards('player'))
 	
 
 def print_hand(name, show_dealer_hand=True):
@@ -204,13 +198,6 @@ def print_hand(name, show_dealer_hand=True):
 			
 		
 	
-	
-def print_card(card):
-	"""
-	Arguments:
-	- card: a tuple representing a card. Cards are represented in tuples as (value, suit)
-	"""
-	print str(card[0]) + card[1],
 
 def highest_sum_cards(name):
 	"""

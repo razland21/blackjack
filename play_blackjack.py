@@ -174,7 +174,7 @@ def print_board(all_players, show_dealer_hand):
 	for card in all_players['player']['hand']:
 		print_card(card)
 
-	print "\n\nPlayer Total: {}".format(sum_cards('player'))
+	print "\n\nPlayer Total: {}\n".format(sum_cards('player'))
 	
 			
 def print_card(card):
@@ -301,7 +301,7 @@ def print_options():
 	print "Choose from the following options:"
 	print "    1 - Hit"
 	print "    2 - Stand"
-	print "\n"
+	print ""
 
 def check_valid_move(move):
 	"""
@@ -387,7 +387,7 @@ def play_blackjack():
 	
 	#*** GAME START ***
 	while True:
-		print "WELCOME TO BLACKJACK! Minimum bet is ${}.".format(rules['min_bet'])
+		print "Minimum bet is ${}.".format(rules['min_bet'])
 		print "Player's total money: ${}\n".format(players['player']['money'])
 		
 		#reset board
@@ -412,7 +412,7 @@ def play_blackjack():
 					set_bet('player', bet)
 					break
 				else:
-					print "You do not have enough money to make that bet. Your current total is ${}.".format(players['player']['money'])
+					print "You do not have enough money to make that bet. Your current total is ${}.\n".format(players['player']['money'])
 		
 		#deal cards to all people in game
 		for person in players:
@@ -485,25 +485,25 @@ def play_blackjack():
 				check_winner()				
 				break
 		break
-	
-	#end game - prompt to replay
+
+def start_game():
+
 	while True:
-		replay = raw_input("Do you want to play again?  Type 'yes' or 'no': ").strip().lower()
-		if replay == "yes":
-			print "Alright, let's play again!\n"
+		choice = raw_input("Do you want to play Blackjack?  Type 'yes' or 'no': ").strip().lower()
+		if choice == "yes":
+			print "Alright, let's play!\n"
 			play_blackjack()
-			break
-		elif replay == "no":
-			print "Thanks for playing!\n"
+		elif choice == "no":
+			print "Thanks for playing!"
 			break 
 		else:
-			print "Sorry, I'm not sure what you mean by {}.".format(replay)
+			print "Sorry, I'm not sure what you mean by {}.\n".format(choice)
 	
 	
 
 #TESTS
 			
-play_blackjack()
+start_game()
 
 #####################################################################
 # Doctest code

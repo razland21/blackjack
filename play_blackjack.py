@@ -169,7 +169,42 @@ def print_board(all_players, show_dealer_hand):
 
 	print "\n\nPlayer Total: {}\n".format(sum_cards('player'))
 	
+
+def print_hand(name, show_dealer_hand=True):
+	"""
+	Print hand of player in picture form
+	"""
+	hand = players[name]['hand']
+	hand_len = len(hand)
+	
+	print "  ______  " * hand_len
+	print " |      | " * hand_len
+	
+	for card in hand:
+		if not show_dealer_hand and hand.index(card) == 0:
+			print " | X    |",
+			continue
+		elif card[0] == 10:
+			print " | 10   |",
+		else:
+			print " | {}    |".format(card[0]),
+	
+	print ""
+	print " |      | " * hand_len
+	
+	for card in players[name]['hand']:
+		if not show_dealer_hand and hand.index(card) == 0:
+			print " |    X |",
+		else:
+			print " |    {} |".format(card[1]),
+	
+	print ""	
+	print " |______| " * hand_len
 			
+			
+		
+	
+	
 def print_card(card):
 	"""
 	Arguments:
@@ -392,9 +427,9 @@ def reset_board():
 	Reset the elements of the board for the next round.  Need to keep total money intact.
 	"""
 	for person in players:
-	players[person]['hand'] = []
-	players[person]['bet'] = 0
-	players[person]['status'] = "playing"
+		players[person]['hand'] = []
+		players[person]['bet'] = 0
+		players[person]['status'] = "playing"
 
 def dealer_play():
 	print "\nDealer's Turn\n"

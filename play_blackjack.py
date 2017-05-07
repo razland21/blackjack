@@ -7,7 +7,6 @@ deck = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'
 
 #main game data tracking
 used_cards_indices = []
-#hands_dict = {'dealer': [], 'player': []}
 
 #rules
 #min_bet: int value
@@ -17,13 +16,9 @@ used_cards_indices = []
 
 rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed': [10, 11], 'shuffle': 40}
 
-#betting data tracking
-# total_money_dict = {'player': 100}
-# bets_dict = {'player': 1}
+#all game data within one dictionary
 
-#CHANGE: put all data within one dictionary
-
-players = {'dealer': {'hand': []}, 
+players = {'dealer': {'hand': [], 'status': 'playing'}, 
 	'player': {'hand': [], 'money': 100, 'bet': 0, 'status': 'playing'}}
 
 #BETTING
@@ -49,10 +44,10 @@ def check_valid_bet(bet):
 	"""
 
 	if not bet.isdigit():
-		print "You must enter an integer greater than 0."
+		print "You must enter an integer greater than 0.\n"
 		return False
 	elif int(bet) < rules['min_bet']:
-		print "You must bet at least ${}.".format(rules['min_bet'])
+		print "You must bet at least ${}.\n".format(rules['min_bet'])
 		return False
 	else:
 		return True
@@ -247,6 +242,26 @@ def check_21(name):
 	
 	return sum_cards(name) == 21
 
+def check_anyone_has_21():
+	dealer_has_21 = check_21('dealer')
+	player_has_21 = check_21('player')
+	
+	if dealer_has_21 or player_has_21:
+		#single player - assuming game automatically over if one of them have 21, so show dealer hand
+		print_board(players, True)
+		
+		if dealer_has_21 and player_has_21:
+			print "Both of you have 21.  Draw."
+		elif dealer_has_21:
+			print "Sorry, dealer has 21.  You lose."
+			change_total_money('player', calculate_change('player','loss'))
+		elif player_has_21:
+			print "Player has Blackjack! You win!"
+			change_total_money('player', calculate_change('player','blackjack'))
+		return True
+	else:
+		return False
+
 def has_ace(name):
 	"""
 	Arguments:
@@ -378,6 +393,20 @@ def reset_board():
 	players['player']['hand'] = []
 	players['player']['bet'] = 0
 	players['player']['status'] = "playing"
+	players['dealer']['status'] = "playing"
+
+def dealer_play():
+	print "\nDealer's Turn\n"
+	
+	while get_player_status('dealer') == 'playing':
+		if dealer_must_hit():
+			hit('dealer', used_cards_indices)
+		else:
+			change_player_status('dealer', 'done')
+	
+	print_board(players, True)
+		
+	
 
 #MAIN GAME
 def play_blackjack():
@@ -386,105 +415,78 @@ def play_blackjack():
 	"""
 	
 	#*** GAME START ***
+	print "Minimum bet is ${}.".format(rules['min_bet'])
+	print "Player's total money: ${}\n".format(players['player']['money'])
+	
+	#reset board
+	reset_board()
+	
+	#check if player has enough money
+	if not check_funding('player', rules['min_bet']):
+		print "Oh no, you're broke! Let's fix that!"
+		change_total_money('player', 100)
+		
+	#check if deck needs shuffling
+	if deck_needs_shuffling(len(used_cards_indices)):
+		shuffle_deck(used_cards_indices)
+	
+	#betting loop: ask for bet/check validity/set bet		
 	while True:
-		print "Minimum bet is ${}.".format(rules['min_bet'])
-		print "Player's total money: ${}\n".format(players['player']['money'])
-		
-		#reset board
-		reset_board()
-		
-		#check if player has enough money
-		if not check_funding('player', rules['min_bet']):
-			print "Oh no, you're broke! Let's fix that!"
-			change_total_money('player', 100)
-			
-		#check if deck needs shuffling
-		if deck_needs_shuffling(len(used_cards_indices)):
-			shuffle_deck(used_cards_indices)
-		
-		#betting loop: ask for bet/check validity/set bet		
-		while True:
-			bet = raw_input("Enter the amount you want to bet: ").strip()
+		bet = raw_input("Enter the amount you want to bet: ").strip()
 
-			if check_valid_bet(bet):
-				bet = int(bet)
-				if check_funding('player', bet):
-					set_bet('player', bet)
-					break
-				else:
-					print "You do not have enough money to make that bet. Your current total is ${}.\n".format(players['player']['money'])
-		
-		#deal cards to all people in game
-		for person in players:
-			players[person]['hand'] = deal_cards(2,used_cards_indices)
-					
-		#check if anyone has 21 
-		dealer_has_21 = check_21('dealer')
-		player_has_21 = check_21('player')
-		
-		
-		if dealer_has_21 or player_has_21:
-			#single player - assuming game automatically over if one of them have 21, so show dealer hand
-			print_board(players, True)
-			
-			if dealer_has_21 and player_has_21:
-				print "Both of you have 21.  Draw."
-			elif dealer_has_21:
-				print "Sorry, dealer has 21.  You lose."
-				change_total_money('player', calculate_change('player','loss'))
-			elif player_has_21:
-				print "Player has Blackjack! You win!"
-				change_total_money('player', calculate_change('player','blackjack'))
-					
-			break
+		if check_valid_bet(bet):
+			bet = int(bet)
+			if check_funding('player', bet):
+				set_bet('player', bet)
+				break
+			else:
+				print "You do not have enough money to make that bet. Your current total is ${}.\n".format(players['player']['money'])
+	
+	#deal cards to all people in game
+	for person in players:
+		players[person]['hand'] = deal_cards(2,used_cards_indices)
+				
+	#check if anyone has 21
+	if check_anyone_has_21():
+		return
 		
 	#*** PLAYER GAME LOOP START ***
 		
-		while True:
-			print_board(players, False)
-			print "Player's Turn\n"
-			print_options()
-			move = raw_input("Enter the number for the move you want to make: ").strip()
-			
-			#if move is not valid, start loop over
-			if not check_valid_move(move):
-				continue
+	while True:
+		print_board(players, False)
+		print "Player's Turn\n"
+		print_options()
+		move = raw_input("Enter the number for the move you want to make: ").strip()
 		
-			if move == "1":
-				print "\nPlayer hits."
-				hit('player', used_cards_indices)
-				if check_busted('player'):
-					print_board(players, True)
-					print "Busted! You lose."
-					change_total_money('player', calculate_change('player','loss'))
-					change_player_status('player', 'loss')
-					break
-				elif check_21('player'):
-					print_board(players, False)
-					print "You have 21. Turn is over."
-					break
-				
-			elif move == "2":
-				print "\nPlayer stands. Turn is over."
+		#if move is not valid, start loop over
+		if not check_valid_move(move):
+			continue
+	
+		if move == "1":
+			print "\nPlayer hits."
+			hit('player', used_cards_indices)
+			if check_busted('player'):
+				print_board(players, True)
+				print "Busted! You lose."
+				change_total_money('player', calculate_change('player','loss'))
+				change_player_status('player', 'loss')
 				break
+			elif check_21('player'):
+				print_board(players, False)
+				print "You have 21. Turn is over."
+				break
+			
+		elif move == "2":
+			print "\nPlayer stands. Turn is over."
+			break
 			
 	#*** DEALER GAME LOOP START ***	
 		
-		if get_player_status('player') != 'loss':
-			print "\nDealer's Turn\n"
-			
-		while True:
-			if get_player_status('player') == 'loss':
-				break
-			
-			if dealer_must_hit():
-				hit('dealer', used_cards_indices)
-			
-			else:
-				print_board(players, True)
-				check_winner()				
-				break
-		break
+	if get_player_status('player') != 'loss':
+		dealer_play()
+		check_winner()				
+	
+		
 
 def start_game():
 

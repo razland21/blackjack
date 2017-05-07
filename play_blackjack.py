@@ -7,7 +7,8 @@ deck = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'
 
 #main game data tracking
 used_cards_indices = []
-
+players = {'dealer': {'hand': [], 'money': 0, 'bet': 0, 'status': 'playing'}, 
+	'player': {'hand': [], 'money': 100, 'bet': 0, 'status': 'playing'}}
 #rules
 #min_bet: int value
 #win/blackjack/loss: multipliers
@@ -16,10 +17,7 @@ used_cards_indices = []
 
 rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed': [10, 11], 'shuffle': 40}
 
-#all game data within one dictionary
 
-players = {'dealer': {'hand': [], 'status': 'playing'}, 
-	'player': {'hand': [], 'money': 100, 'bet': 0, 'status': 'playing'}}
 
 #BETTING
 
@@ -372,12 +370,12 @@ def check_winner():
 		print "Sorry, dealer won."
 		change_total_money('player', calculate_change('player', 'loss'))
 	elif sum_cards('player') == sum_cards('dealer'):
-		print "Draw."
+		print "Draw.\n"
 	else:
 		if check_busted('dealer'):				
-			print "Dealer busted! Player wins!"
+			print "Dealer busted! Player wins!\n"
 		elif sum_cards('player') > sum_cards('dealer'):
-			print "Congratulations, player wins!"
+			print "Congratulations, player wins!\n"
 		change_total_money('player', calculate_change('player', 'win'))
 
 def change_player_status(name, status):
@@ -390,10 +388,13 @@ def get_player_status(name):
 	return players[name]['status']
 
 def reset_board():
-	players['player']['hand'] = []
-	players['player']['bet'] = 0
-	players['player']['status'] = "playing"
-	players['dealer']['status'] = "playing"
+	"""
+	Reset the elements of the board for the next round.  Need to keep total money intact.
+	"""
+	for person in players:
+	players[person]['hand'] = []
+	players[person]['bet'] = 0
+	players[person]['status'] = "playing"
 
 def dealer_play():
 	print "\nDealer's Turn\n"
@@ -405,6 +406,39 @@ def dealer_play():
 			change_player_status('dealer', 'done')
 	
 	print_board(players, True)
+
+def player_play():
+	"""
+	For now, assumes single player.  Probably will need to take player name as argument later when supporting multiplayer.
+	"""
+	while get_player_status('player') == 'playing':
+		print_board(players, False)
+		print "Player's Turn\n"
+		print_options()
+		move = raw_input("Enter the number for the move you want to make: ").strip()
+		
+		#if move is not valid, start loop over
+		if not check_valid_move(move):
+			continue
+	
+		if move == "1":
+			print "\nPlayer hits."
+			hit('player', used_cards_indices)
+			if check_busted('player'):
+				print_board(players, True)
+				print "Busted! You lose."
+				change_total_money('player', calculate_change('player','loss'))
+				change_player_status('player', 'loss')
+				
+			elif check_21('player'):
+				print_board(players, False)
+				print "You have 21. Turn is over."
+				change_player_status('player','done')
+			
+		elif move == "2":
+			print "\nPlayer stands. Turn is over."
+			change_player_status('player','done')
+
 		
 	
 
@@ -452,33 +486,7 @@ def play_blackjack():
 		
 	#*** PLAYER GAME LOOP START ***
 		
-	while True:
-		print_board(players, False)
-		print "Player's Turn\n"
-		print_options()
-		move = raw_input("Enter the number for the move you want to make: ").strip()
-		
-		#if move is not valid, start loop over
-		if not check_valid_move(move):
-			continue
-	
-		if move == "1":
-			print "\nPlayer hits."
-			hit('player', used_cards_indices)
-			if check_busted('player'):
-				print_board(players, True)
-				print "Busted! You lose."
-				change_total_money('player', calculate_change('player','loss'))
-				change_player_status('player', 'loss')
-				break
-			elif check_21('player'):
-				print_board(players, False)
-				print "You have 21. Turn is over."
-				break
-			
-		elif move == "2":
-			print "\nPlayer stands. Turn is over."
-			break
+	player_play()
 			
 	#*** DEALER GAME LOOP START ***	
 		

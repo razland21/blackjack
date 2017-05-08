@@ -19,6 +19,15 @@ rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed
 
 
 
+#DOUBLING
+
+def check_double(name):
+	"""
+	Check whether player can double down on his/her hand
+	"""
+	
+	return sum_cards(name) in rules['doubling_allowed']
+
 #BETTING
 
 def check_valid_bet(bet):

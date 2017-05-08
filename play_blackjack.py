@@ -30,15 +30,6 @@ def check_valid_bet(bet):
 	- True if bet is valid. False otherwise.
 	Assumptions:
 	- bets must be integers greater than 1
-	
-	>>> check_valid_bet("1")
-	True
-	>>> rules['min_bet'] = 2
-	>>> check_valid_bet("1")
-	You must bet at least $2.
-	False
-	>>> check_valid_bet("2")
-	True
 	"""
 
 	if not bet.isdigit():
@@ -68,12 +59,6 @@ def set_bet(name, bet):
 	Arguments:
 	- name: string representing the name of the player
 	- bet: int representing amount player wants to bet
-	>>> print bets_dict['player']
-	1
-	>>> set_bet('player', 5)
-	Player has bet $5 in this round.
-	>>> print bets_dict['player']
-	5
 	"""
 	
 	players[name]['bet'] = bet
@@ -109,8 +94,6 @@ def calculate_change(name, rule):
 		print "{} is an invalid rule. No change will be made to {}'s total".format(rule, name)
 	
 	return total
-
-
 
 
 #MAIN SUPPORTING FUNCTIONS
@@ -163,7 +146,6 @@ def print_board(all_players, show_dealer_hand):
 
 	print "\nPlayer Total: {}\n".format(sum_cards('player'))
 	
-
 def print_hand(name, show_dealer_hand=True):
 	"""
 	Print hand of player in picture form
@@ -194,11 +176,7 @@ def print_hand(name, show_dealer_hand=True):
 	
 	print ""	
 	print " |______| " * hand_len
-			
-			
-		
 	
-
 def highest_sum_cards(name):
 	"""
 	Calculates highest possible sum of cards.  This is to determine how to handle Ace cards in hands. 
@@ -460,11 +438,9 @@ def player_play():
 		elif move == "2":
 			print "\nPlayer stands. Turn is over."
 			change_player_status('player','done')
-
-		
 	
 
-#MAIN GAME
+	#MAIN GAME
 def play_blackjack():
 	"""
 	Main function to run blackjack game.
@@ -517,15 +493,25 @@ def play_blackjack():
 		check_winner()				
 	
 		
+#START GAME
 
+def print_main_menu():
+	print "Select from one of the following options:"
+	print "    1: Play Blackjack"
+	print "    2: Quit"
+	print ""
+	
 def start_game():
-
+	print "\nWELCOME TO BLACKJACK! \n"
+	
 	while True:
-		choice = raw_input("Do you want to play Blackjack?  Type 'yes' or 'no': ").strip().lower()
-		if choice == "yes":
+		print_main_menu()
+		
+		choice = raw_input("Enter choice selection: ").strip().lower()
+		if choice == "1":
 			print "Alright, let's play!\n"
 			play_blackjack()
-		elif choice == "no":
+		elif choice == "2":
 			print "Thanks for playing!"
 			break 
 		else:
@@ -534,7 +520,7 @@ def start_game():
 	
 
 #TESTS
-			
+
 start_game()
 
 #####################################################################

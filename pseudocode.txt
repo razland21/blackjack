@@ -6,23 +6,48 @@ MVP
 + no betting
 
 Backlog
-- betting
++ betting
 - allow for doubling down on 10/11
 - allow for splitting pairs
 - multiple players
 - option to use multiple decks
 - insurance if dealer is showing A
-- main menu
++ main menu
 - change settings for rules
 - player(s) can input their own name
 
 ----------------------------------------------------------------------------------------------
 ***RULES DICTIONARY***
 min_bet: 1
-win_mult: 1
-blackjack_mult: 1.5
-lose_mult: -1
+win: 1
+blackjack: 1.5
+loss: -1
 doubling_allowed: [10, 11]
+
+----------------------------------------------------------------------------------------------
+***DOUBLING PSEUDOCODE***
+
+Code Outline:
+
+[fn] check if card can be doubled - reference doubling_allowed in rules dictionary
+	- if yes, show option in player options list
+	- if no, do not show option in player options list
+
+[fn-edit] check_valid_move 
+	- if player selects option to double, check whether it is a valid move for that hand
+	- if yes, continue. otherwise, have player select another option
+
+if player chooses to double
+	- check if player has enough money to do so
+		- if yes, continue
+		- if no...continue anyway?
+	- give one card
+	- end player's turn
+	
+Notes:
+	- ideally, card should not be revealed until after game over
+		- if not, then reveal card when it is dealt, check if player busted
+
 
 ----------------------------------------------------------------------------------------------
 ***BETTING PSEUDOCODE***

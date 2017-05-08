@@ -440,7 +440,8 @@ def player_play():
 			change_player_status('player','done')
 	
 
-	#MAIN GAME
+#MAIN GAME
+
 def play_blackjack():
 	"""
 	Main function to run blackjack game.

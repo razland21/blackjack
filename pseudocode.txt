@@ -3,6 +3,8 @@ In Progress
 
 
 Backlog
+- change print_hand(): show_dealer_hand argument should be hide_card argument that takes a digit representing which card to hide (starting at 0)
+- optimize used_cards_indices: make into a list of 1/0 to indicate whether a card has been used or not (each index corresponds to the index of the card)
 - multiple players (think about how board prints...show as player's turns happen?)
 - hide card dealt from doubling down
 - option to use multiple decks

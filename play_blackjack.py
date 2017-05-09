@@ -8,7 +8,7 @@ deck = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'
 #main game data tracking
 used_cards_indices = []
 players = {'dealer': {'hand': [], 'money': 0, 'bet': 0, 'status': 'playing'}, 
-	'player': {'hand': [], 'money': 100, 'bet': 0, 'status': 'playing'}}
+	'player': {'hand': [], 'money': 100, 'bet': 0, 'status': 'playing', 'hand_s1': [], 'bet_s1': 0}}
 
 #rules
 #min_bet: int value
@@ -30,6 +30,29 @@ def check_split(name):
 	else:
 		return players[name]['hand'][0][0] == players[name]['hand'][1][0]
 
+def process_split(name):
+	"""
+	Player has requested to split
+	"""
+	# TEMP: remove later.
+	# print "You have requested to split...but this game doesn't do that yet. Please do something else."
+	
+	if not check_split(name):
+		print "You cannot split this hand."
+	elif not check_funding(name, players[name]['bet']*2):
+		print "You don't have enough money for this... but we'll let you do it anyway."
+
+	# Split the hands.
+	players[name]['hand_s1'].append(players[name]['hand'].pop())
+	players[name]['bet_s1'] = players[name]['bet']
+	
+	#Add card to each hand.
+	hit(name, used_cards_indices)
+	hit(name, used_cards_indices, 'hand_s1')
+	
+	#TBC: Process each hand.
+	
+	return
 		
 #DOUBLING
 
@@ -61,12 +84,7 @@ def process_double(name):
 	else:
 		change_player_status(name, 'done')
 	
-def process_split(name):
-	"""
-	Player has requested to split
-	"""
-	print "You have requested to split...but this game doesn't do that yet. Please do something else."
-	return
+
 
 #BETTING
 
@@ -102,7 +120,7 @@ def check_funding(name, bet):
 	
 	return players[name]['money'] >= bet
 
-def set_bet(name, bet):
+def set_bet(name, bet, bet_name='bet'):
 	"""
 	Sets bet for player.
 	Arguments:
@@ -110,7 +128,7 @@ def set_bet(name, bet):
 	- bet: int representing amount player wants to bet
 	"""
 	
-	players[name]['bet'] = bet
+	players[name][bet_name] = bet
 	print "{} has bet ${} in this round.".format(name.title(),bet)
 	
 def change_total_money(name, amount):
@@ -187,7 +205,7 @@ def print_board(all_players, show_dealer_hand):
 		print "\nDealer Total: {}".format(sum_cards('dealer'))
 
 	else:
-		print_hand('dealer', False)
+		print_hand('dealer', 0)
 
 		
 	print "\n\n***PLAYER***"
@@ -195,18 +213,18 @@ def print_board(all_players, show_dealer_hand):
 
 	print "\nPlayer Total: {}\n".format(sum_cards('player'))
 	
-def print_hand(name, show_dealer_hand=True):
+def print_hand(name, hide_card="No", hand_name='hand'):
 	"""
 	Print hand of player in picture form
 	"""
-	hand = players[name]['hand']
+	hand = players[name][hand_name]
 	hand_len = len(hand)
 	
 	print "  ______  " * hand_len
 	print " |      | " * hand_len
 	
 	for card in hand:
-		if not show_dealer_hand and hand.index(card) == 0:
+		if type(hide_card) == int and hand.index(card) == hide_card:
 			print " | X    |",
 			continue
 		elif card[0] == 10:
@@ -217,8 +235,8 @@ def print_hand(name, show_dealer_hand=True):
 	print ""
 	print " |      | " * hand_len
 	
-	for card in players[name]['hand']:
-		if not show_dealer_hand and hand.index(card) == 0:
+	for card in players[name][hand_name]:
+		if type(hide_card) == int and hand.index(card) == hide_card:
 			print " |    X |",
 		else:
 			print " |    {} |".format(card[1]),
@@ -333,17 +351,18 @@ def check_busted(name):
 	
 	return sum_cards(name) > 21
 		
-def hit(name, used_cards):
+def hit(name, used_cards, hand='hand'):
 	"""
 	Adds one card from the deck into a player's hand.
 	Arguments:
-	- hand: a list of cards representing the hand to add a card to
+	- name: a string representing player
 	- used_cards: a list of indices representing cards already used in deck
+	- hand: a list of cards representing the hand to add a card to
 	Notes:
 	- deal_cards() returns a list of one card - [0] is added to append the card itself to the hand
 	"""
 	
-	players[name]['hand'].append(deal_cards(1,used_cards)[0])
+	players[name][hand].append(deal_cards(1,used_cards)[0])
 
 def deck_needs_shuffling(num_cards_used):
 	"""

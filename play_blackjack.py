@@ -23,10 +23,10 @@ rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed
 
 def check_double(name):
 	"""
-	Check whether player can double down on his/her hand
+	Check whether player can double down on his/her hand.  Players can only double if the sum of the *original* hand equals one of the numbers in the 'doubling_allowed' rule.
 	"""
 	
-	return sum_cards(name) in rules['doubling_allowed']
+	return sum_cards(name) in rules['doubling_allowed'] and len(players[name]['hand']) == 2
 
 #BETTING
 
@@ -316,13 +316,15 @@ def deck_needs_shuffling(num_cards_used):
 	
 	return num_cards_used > rules['shuffle']
 	
-def print_options():
+def print_options(name):
 	"""
 	Prints player's options.
 	"""
 	print "Choose from the following options:"
 	print "    1 - Hit"
 	print "    2 - Stand"
+	if check_double(name):
+		print "    3 - Double"
 	print ""
 
 def check_valid_move(move):
@@ -340,7 +342,7 @@ def check_valid_move(move):
 	elif not move.isdigit():
 		print "You must enter a number."
 		return False
-	elif int(move) > 2:
+	elif int(move) > 3:
 		print "You must enter one of the numbers above."
 		return False
 	else:
@@ -379,7 +381,7 @@ def check_winner():
 		print "Sorry, dealer won."
 		change_total_money('player', calculate_change('player', 'loss'))
 	elif sum_cards('player') == sum_cards('dealer'):
-		print "Draw.\n"
+		print "Push.\n"
 	else:
 		if check_busted('dealer'):				
 			print "Dealer busted! Player wins!\n"
@@ -423,7 +425,7 @@ def player_play():
 	while get_player_status('player') == 'playing':
 		print_board(players, False)
 		print "Player's Turn\n"
-		print_options()
+		print_options('player')
 		move = raw_input("Enter the number for the move you want to make: ").strip()
 		
 		#if move is not valid, start loop over
@@ -447,6 +449,25 @@ def player_play():
 		elif move == "2":
 			print "\nPlayer stands. Turn is over."
 			change_player_status('player','done')
+		
+		elif move =="3":
+			if not check_double('player'):
+				print "You cannot double down on this hand."
+				continue
+			elif not check_funding('player', players['player']['bet']*2):
+				print "You don't have enough money for this... but we'll let you do it anyway."
+			
+			set_bet('player', players['player']['bet']*2)
+			hit('player', used_cards_indices)
+			print "Card dealt - turn is over."
+			if check_busted('player'):
+				print_board(players, True)
+				print "Busted! You lose."
+				change_total_money('player', calculate_change('player','loss'))
+				change_player_status('player', 'loss')				
+			else:
+				change_player_status('player', 'done')
+		
 	
 
 #MAIN GAME
@@ -463,8 +484,8 @@ def play_blackjack():
 	#reset board
 	reset_board()
 	
-	#check if player has enough money
-	if not check_funding('player', rules['min_bet']):
+	#check if player has enough money, adds in $100 increments if not
+	while not check_funding('player', rules['min_bet']):
 		print "Oh no, you're broke! Let's fix that!"
 		change_total_money('player', 100)
 		

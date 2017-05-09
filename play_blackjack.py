@@ -7,8 +7,8 @@ deck = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'
 
 #main game data tracking
 used_cards_indices = []
-players = {'dealer': {'hand': [], 'money': 0, 'bet': 0, 'status': 'playing'}, 
-	'player': {'hand': [], 'money': 100, 'bet': 0, 'status': 'playing', 'hand_s1': [], 'bet_s1': 0}}
+players = {'dealer': {'hand': [[]], 'money': 0, 'bet': [0], 'status': 'playing'}, 
+	'player': {'hand': [[]], 'money': 100, 'bet': [0], 'status': 'playing'}}
 
 #rules
 #min_bet: int value
@@ -20,17 +20,17 @@ rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed
 
 #SPLITTING
 
-def check_split(name, hand_name='hand'):
+def check_split(name, hand_num=0):
 	"""
 	Check whether player can split his/her hand.  Players can only split of the values of the two cards are exactly the same.
 	"""
 	
-	if len(players[name][hand_name]) > 2:
+	if len(players[name]['hand'][hand_num]) > 2:
 		return False
 	else:
-		return players[name][hand_name][0][0] == players[name][hand_name][1][0]
+		return players[name]['hand'][hand_num][0][0] == players[name]['hand'][hand_num][1][0]
 
-def process_split(name):
+def process_split(name, hand_num=0):
 	"""
 	Player has requested to split
 	"""
@@ -39,50 +39,57 @@ def process_split(name):
 	
 	if not check_split(name):
 		print "You cannot split this hand."
-	elif not check_funding(name, players[name]['bet']*2):
+	elif not check_funding(name, players[name]['bet'][hand_num]*2):
 		print "You don't have enough money for this... but we'll let you do it anyway."
 
 	# Split the hands.
-	players[name]['hand_s1'].append(players[name]['hand'].pop())
-	players[name]['bet_s1'] = players[name]['bet']
+	card = players[name]['hand'][hand_num].pop()
+	new_hand = []
+	new_hand.append(card)
 	
-	#Add card to each hand.
-	hit(name, used_cards_indices)
-	hit(name, used_cards_indices, 'hand_s1')
+	players[name]['hand'].append(new_hand)
 	
-	#TBC: Process each hand.
+	# Add new bet to bet list.  Assumes equal to bet of hand being split.
+	players[name]['bet'].append(players[name]['bet'][hand_num])
+	
+	
+	#TBC: Process each hand.  for loop on index , include adding card to each hand.
+	# 	hit(name, used_cards_indices, 1)
 	
 	return
 		
 #DOUBLING
 
-def check_double(name, hand_name='hand'):
+def check_double(name, hand_num=0):
 	"""
 	Check whether player can double down on his/her hand.  Players can only double if the sum of the *original* hand equals one of the numbers in the 'doubling_allowed' rule.
 	"""
 	
-	return sum_cards(name, hand_name) in rules['doubling_allowed'] and len(players[name][hand_name]) == 2
+	return sum_cards(name, hand_num) in rules['doubling_allowed'] and len(players[name]['hand'][hand_num]) == 2
 
-def process_double(name):
+def process_double(name, hand_num=0):
 	"""
 	Player has requested to double
+	Assumptions:
+	- Assuming doubling on first hand.
 	"""
-	if not check_double(name):
+	if not check_double(name, hand_num):
 		print "You cannot double down on this hand."
 		return
-	elif not check_funding(name, players[name]['bet']*2):
+	elif not check_funding(name, get_bet(name, hand_num)*2):
 		print "You don't have enough money for this... but we'll let you do it anyway."
 	
-	set_bet(name, players[name]['bet']*2)
-	hit(name, used_cards_indices)
+	set_bet(name, get_bet(name, hand_num)*2)
+	hit(name, used_cards_indices, hand_num)
+	change_player_status(name, 'double')
 	print "Card dealt - turn is over."
-	if check_busted(name):
+	if check_busted(name, hand_num):
 		print_board(players, True)
 		print "Busted! You lose."
-		change_total_money(name, calculate_change(name,'loss'))
-		change_player_status(name, 'loss')				
+		change_total_money(name, calculate_change(name,'loss'), hand_num)
+		change_player_status(name, 'loss') # change player status after ALL split hands				
 	else:
-		change_player_status(name, 'done')
+		change_player_status(name, 'done') # change player status after ALL split hands	
 	
 
 
@@ -120,7 +127,14 @@ def check_funding(name, bet):
 	
 	return players[name]['money'] >= bet
 
-def set_bet(name, bet, bet_name='bet'):
+def get_bet(name, bet_num=0):
+	"""
+	Get value of current bet for a player's hand
+	"""
+	
+	return players[name]['bet'][bet_num]
+
+def set_bet(name, bet, bet_num=0):
 	"""
 	Sets bet for player.
 	Arguments:
@@ -128,7 +142,7 @@ def set_bet(name, bet, bet_name='bet'):
 	- bet: int representing amount player wants to bet
 	"""
 	
-	players[name][bet_name] = bet
+	players[name]['bet'][bet_num] = bet
 	print "{} has bet ${} in this round.".format(name.title(),bet)
 	
 def change_total_money(name, amount):
@@ -143,7 +157,7 @@ def change_total_money(name, amount):
 	players[name]['money'] += amount
 	print "{}'s current total money: ${}\n".format(name.title(), players[name]['money'])
 
-def calculate_change(name, rule):
+def calculate_change(name, rule, bet_num=0):
 	"""
 	Calculates how much the total money of a player should change by based on end result of game.
 	Arguments:
@@ -156,7 +170,7 @@ def calculate_change(name, rule):
 	total = 0
 	
 	if rule in rules:
-		total = players[name]['bet'] * rules[rule]
+		total = players[name]['bet'][bet_num] * rules[rule]
 	else:
 		print "{} is an invalid rule. No change will be made to {}'s total".format(rule, name)
 	
@@ -207,17 +221,17 @@ def print_board(all_players, show_dealer_hand):
 	else:
 		print_hand('dealer', 0)
 
-		
+	#to add: if player status = double, hide last card and total.	
 	print "\n\n***PLAYER***"
 	print_hand('player')
 
 	print "\nPlayer Total: {}\n".format(sum_cards('player'))
 	
-def print_hand(name, hide_card="No", hand_name='hand'):
+def print_hand(name, hide_card="No", hand_num=0):
 	"""
 	Print hand of player in picture form
 	"""
-	hand = players[name][hand_name]
+	hand = players[name]['hand'][hand_num]
 	hand_len = len(hand)
 	
 	print "  ______  " * hand_len
@@ -235,7 +249,7 @@ def print_hand(name, hide_card="No", hand_name='hand'):
 	print ""
 	print " |      | " * hand_len
 	
-	for card in players[name][hand_name]:
+	for card in players[name]['hand'][hand_num]:
 		if type(hide_card) == int and hand.index(card) == hide_card:
 			print " |    X |",
 		else:
@@ -244,7 +258,7 @@ def print_hand(name, hide_card="No", hand_name='hand'):
 	print ""	
 	print " |______| " * hand_len
 	
-def highest_sum_cards(name, hand_name='hand'):
+def highest_sum_cards(name, hand_num=0):
 	"""
 	Calculates highest possible sum of cards.  This is to determine how to handle Ace cards in hands. 
 	Arguments:
@@ -256,7 +270,7 @@ def highest_sum_cards(name, hand_name='hand'):
 	sum_hand = 0
 	added_ace = False
 	
-	for card in players[name][hand_name]:
+	for card in players[name]['hand'][hand_num]:
 		if card[0] in ['J', 'Q', 'K']:
 			sum_hand += 10
 		elif card[0] == 'A':
@@ -270,7 +284,7 @@ def highest_sum_cards(name, hand_name='hand'):
 	
 	return sum_hand
 	
-def	sum_cards(name, hand_name='hand'):
+def	sum_cards(name, hand_num=0):
 	"""
 	Arguments:
 	- name: a string representing the name of player whose hand to check  
@@ -286,8 +300,8 @@ def	sum_cards(name, hand_name='hand'):
 	>>> sum_cards([("A","H"),(2,"D"),(3,"H"),("A","S")])
 	17
 	"""
-	sum_hand = highest_sum_cards(name, hand_name)
-	added_ace = has_ace(name, hand_name)
+	sum_hand = highest_sum_cards(name, hand_num)
+	added_ace = has_ace(name, hand_num)
 
 	#check for overage caused by Ace and adjust
 	if sum_hand > 21:
@@ -296,7 +310,7 @@ def	sum_cards(name, hand_name='hand'):
 		
 	return sum_hand
 	
-def check_21(name, hand_name='hand'):
+def check_21(name, hand_num=0):
 	"""
 	Checks whether the given player's hand has a value of 21.
 	Arguments:
@@ -305,9 +319,12 @@ def check_21(name, hand_name='hand'):
 	- True if value of hand is 21. False otherwise.
 	"""
 	
-	return sum_cards(name, hand_name) == 21
+	return sum_cards(name, hand_num) == 21
 
 def check_anyone_has_21():
+	"""
+	This check only happens at the beginning of each game - assumes looking at first hand only of each player.
+	"""
 	dealer_has_21 = check_21('dealer')
 	player_has_21 = check_21('player')
 	
@@ -330,20 +347,20 @@ def check_anyone_has_21():
 	else:
 		return False
 
-def has_ace(name, hand_name='hand'):
+def has_ace(name, hand_num=0):
 	"""
 	Arguments:
 	- name: a string representing the person whose hand to check
 	Returns:
 	- True if at least one Ace card exists in the hand. False otherwise.
 	"""
-	for card in players[name][hand_name]:
+	for card in players[name]['hand'][hand_num]:
 		if 'A' in card:
 			return True
 			
 	return False
 
-def check_busted(name, hand_name='hand'):
+def check_busted(name, hand_num=0):
 	"""
 	Checks if value of player's hand is greater than 21.
 	Arguments:
@@ -352,9 +369,9 @@ def check_busted(name, hand_name='hand'):
 	- True if hand is greater than 21. False otherwise.
 	"""
 	
-	return sum_cards(name, hand_name) > 21
+	return sum_cards(name, hand_num) > 21
 		
-def hit(name, used_cards, hand_name='hand'):
+def hit(name, used_cards, hand_num=0):
 	"""
 	Adds one card from the deck into a player's hand.
 	Arguments:
@@ -365,7 +382,7 @@ def hit(name, used_cards, hand_name='hand'):
 	- deal_cards() returns a list of one card - [0] is added to append the card itself to the hand
 	"""
 	
-	players[name][hand_name].append(deal_cards(1,used_cards)[0])
+	players[name]['hand'][hand_num].append(deal_cards(1,used_cards)[0])
 
 def deck_needs_shuffling(num_cards_used):
 	"""
@@ -378,16 +395,16 @@ def deck_needs_shuffling(num_cards_used):
 	
 	return num_cards_used > rules['shuffle']
 	
-def print_options(name, hand_name='hand'):
+def print_options(name, hand_num=0):
 	"""
 	Prints player's options.
 	"""
 	print "Choose from the following options:"
 	print "    1 - Hit"
 	print "    2 - Stand"
-	if check_double(name, hand_name):
+	if check_double(name, hand_num):
 		print "    3 - Double"
-	if check_split(name, hand_name):
+	if check_split(name, hand_num):
 		print "    4 - Split"
 	print ""
 
@@ -412,12 +429,12 @@ def check_valid_move(move):
 	else:
 		return True
 
-def check_soft_17(name, hand_name='hand'):
+def check_soft_17(name, hand_num=0):
 	"""
 	Check if a player's hand is a soft 17 (i.e. hand is 17 because A = 11)
 	"""
 	
-	return highest_sum_cards(name, hand_name) == 17 and has_ace(name, hand_name)
+	return highest_sum_cards(name, hand_num) == 17 and has_ace(name, hand_num)
 		
 def dealer_must_hit():
 	"""
@@ -465,25 +482,23 @@ def reset_board():
 	Reset the elements of the board for the next round.  Need to keep total money intact.
 	"""
 	for person in players:
-		players[person]['hand'] = []		
-		players[person]['hand_s1'] = []
-		players[person]['bet'] = 0
-		players[person]['bet_s1'] = 0
+		players[person]['hand'] = [[]]	
+		players[person]['bet'] = [0]
 		players[person]['status'] = "playing"
 
-def process_hit(name, hand_name='hand'):
+def process_hit(name, hand_num=0):
 	"""
 	Player has requested to hit.
 	"""
 	print "\n{} hits.".format(name.title())
-	hit(name, used_cards_indices, hand_name)
-	if check_busted(name, hand_name):
+	hit(name, used_cards_indices, hand_num)
+	if check_busted(name, hand_num):
 		print_board(players, True)  #This probably changes for multiplayer
 		print "Busted! You lose."
 		change_total_money(name, calculate_change(name,'loss'))
 		change_player_status(name, 'loss')
 		
-	elif check_21(name):
+	elif check_21(name, hand_num):
 		print_board(players, False)
 		print "You have 21. Turn is over."
 		change_player_status(name, 'done')
@@ -566,7 +581,7 @@ def play_blackjack():
 	
 	#deal cards to all people in game
 	for person in players:
-		players[person]['hand'] = deal_cards(2,used_cards_indices)
+		players[person]['hand'][0] = deal_cards(2,used_cards_indices)
 				
 	#check if anyone has 21
 	if check_anyone_has_21():

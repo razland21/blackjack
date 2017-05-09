@@ -1,12 +1,13 @@
 In Progress
-- changing functions to take in hand name as optional argument (for splitting)
----> need to review process_split and process_double
-- change check_winner() to handle checking split hands
 - allow for splitting pairs
+---> need to review process_split - finish writing.
+- change check_winner() to handle checking split hands
 
+[] does player_play() need to pass in hands?  maybe not if all processed in process_split()
 
 Backlog
-- optimize used_cards_indices: make into a list of 1/0 to indicate whether a card has been used or not (each index corresponds to the index of the card)
+- change print_board() to handle printing split hands
+- optimize used_cards_indices: make into a list of 1/0 to indicate whether a card has been used or not (each index corresponds to the index of the card, so used_cards[num] = 1)
 - multiple players (think about how board prints...show as player's turns happen?)
 - hide card dealt from doubling down
 - option to use multiple decks
@@ -20,6 +21,7 @@ Completed
 + betting
 + allow for doubling down on 10/11 (supports any rules defined in dictionary)
 + change print_hand(): show_dealer_hand argument should be hide_card argument that takes a digit representing which card to hide (starting at 0)
++ changing functions to take in index as optional argument (for splitting)
 	
 
 MVP
@@ -31,10 +33,10 @@ MVP
 
 ----------------------------------------------------------------------------------------------
 ***PLAYER DICTIONARY***
-hand: []
-money: int
+hand: [[]] - a list of a list containing cards
+money: [int] - a list of ints, one for each hand
 bet: int
-status: string (playing, loss, done)
+status: string (playing, loss, done, double)
 
 ----------------------------------------------------------------------------------------------
 ***RULES DICTIONARY***

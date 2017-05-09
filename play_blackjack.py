@@ -9,6 +9,7 @@ deck = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'
 used_cards_indices = []
 players = {'dealer': {'hand': [], 'money': 0, 'bet': 0, 'status': 'playing'}, 
 	'player': {'hand': [], 'money': 100, 'bet': 0, 'status': 'playing'}}
+
 #rules
 #min_bet: int value
 #win/blackjack/loss: multipliers
@@ -17,8 +18,19 @@ players = {'dealer': {'hand': [], 'money': 0, 'bet': 0, 'status': 'playing'},
 
 rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed': [10, 11], 'shuffle': 40}
 
+#SPLITTING
 
+def check_split(name):
+	"""
+	Check whether player can split his/her hand.  Players can only split of the values of the two cards are exactly the same.
+	"""
+	
+	if len(players[name]['hand']) > 2:
+		return False
+	else:
+		return players[name]['hand'][0][0] == players[name]['hand'][1][0]
 
+		
 #DOUBLING
 
 def check_double(name):
@@ -27,6 +39,7 @@ def check_double(name):
 	"""
 	
 	return sum_cards(name) in rules['doubling_allowed'] and len(players[name]['hand']) == 2
+
 
 #BETTING
 
@@ -373,8 +386,6 @@ def dealer_must_hit():
 def check_winner():
 	"""
 	Checks who won the game.
-	Arguments:
-	- all_hands: a dictionary representing all hands in current game
 	"""
 	
 	if sum_cards('player') < sum_cards('dealer') and not check_busted('dealer'):

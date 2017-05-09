@@ -1,20 +1,28 @@
+In Progress
+
+
+Backlog
+- allow for splitting pairs
+- multiple players
+- hide card dealt from doubling down
+- option to use multiple decks
+- insurance if dealer is showing A
+- change settings for rules
+- player(s) can input their own name
+
+
+Completed
++ main menu
++ betting
++ allow for doubling down on 10/11 (supports any rules defined in dictionary)
 	
+
 MVP
 + single player: 1 player vs AI
 + main game loop
 + dealer stops at 17 (including soft 17)
 + no betting
 
-Backlog
-+ betting
-- allow for doubling down on 10/11
-- allow for splitting pairs
-- multiple players
-- option to use multiple decks
-- insurance if dealer is showing A
-+ main menu
-- change settings for rules
-- player(s) can input their own name
 
 ----------------------------------------------------------------------------------------------
 ***RULES DICTIONARY***
@@ -45,7 +53,7 @@ if player chooses to double
 	- end player's turn
 	
 Notes:
-	- ideally, card should not be revealed until after game over
+	- ideally, card should not be revealed until after game over  (probably do this after MP added)
 		- if not, then reveal card when it is dealt, check if player busted
 
 

@@ -30,6 +30,23 @@ def check_split(name, hand_num=0):
 	else:
 		return players[name]['hand'][hand_num][0][0] == players[name]['hand'][hand_num][1][0]
 
+def split_hands(name, hand_num=0):
+	"""
+	Split the hand into two separate hands and create separate bets for each hand.
+	"""
+	# Split the hands.
+	card = players[name]['hand'][hand_num].pop()
+	new_hand = []
+	new_hand.append(card)
+	
+	players[name]['hand'].append(new_hand)
+	
+	# Add new bet to bet list.  Assumes equal to bet of hand being split.
+	players[name]['bet'].append(players[name]['bet'][hand_num])
+
+	
+	
+
 def process_split(name, hand_num=0):
 	"""
 	Player has requested to split
@@ -42,19 +59,14 @@ def process_split(name, hand_num=0):
 	elif not check_funding(name, players[name]['bet'][hand_num]*2):
 		print "You don't have enough money for this... but we'll let you do it anyway."
 
-	# Split the hands.
-	card = players[name]['hand'][hand_num].pop()
-	new_hand = []
-	new_hand.append(card)
-	
-	players[name]['hand'].append(new_hand)
-	
-	# Add new bet to bet list.  Assumes equal to bet of hand being split.
-	players[name]['bet'].append(players[name]['bet'][hand_num])
+	split_hands(name, hand_num)
 	
 	
 	#TBC: Process each hand.  for loop on index , include adding card to each hand.
-	# 	hit(name, used_cards_indices, 1)
+	
+	for num in range(len(players[name]['hand'])):
+		hit(name, used_cards_indices, num)
+		player_play(name, num)
 	
 	return
 		
@@ -84,7 +96,7 @@ def process_double(name, hand_num=0):
 	change_player_status(name, 'double')
 	print "Card dealt - turn is over."
 	if check_busted(name, hand_num):
-		print_board(players, True)
+		print_board(True)
 		print "Busted! You lose."
 		change_total_money(name, calculate_change(name,'loss'), hand_num)
 		change_player_status(name, 'loss') # change player status after ALL split hands				
@@ -207,7 +219,7 @@ def deal_cards(num_cards, used_cards):
 	
 	return cards
 	
-def print_board(all_players, show_dealer_hand):
+def print_board(show_dealer_hand):
 	"""
 	Arguments:
 	- all_players: a dictionary representing all players in current game
@@ -222,6 +234,7 @@ def print_board(all_players, show_dealer_hand):
 		print_hand('dealer', 0)
 
 	#to add: if player status = double, hide last card and total.	
+	#for num in range(len(all_players)
 	print "\n\n***PLAYER***"
 	print_hand('player')
 
@@ -330,7 +343,7 @@ def check_anyone_has_21():
 	
 	if dealer_has_21 or player_has_21:
 		#single player - assuming game automatically over if one of them have 21, so show dealer hand
-		print_board(players, True)
+		print_board(True)
 		
 		if dealer_has_21 and player_has_21:
 			print "Both of you have 21.  Draw."
@@ -493,13 +506,13 @@ def process_hit(name, hand_num=0):
 	print "\n{} hits.".format(name.title())
 	hit(name, used_cards_indices, hand_num)
 	if check_busted(name, hand_num):
-		print_board(players, True)  #This probably changes for multiplayer
+		print_board(True)  #This probably changes for multiplayer
 		print "Busted! You lose."
 		change_total_money(name, calculate_change(name,'loss'))
 		change_player_status(name, 'loss')
 		
 	elif check_21(name, hand_num):
-		print_board(players, False)
+		print_board(False)
 		print "You have 21. Turn is over."
 		change_player_status(name, 'done')
 
@@ -513,16 +526,16 @@ def dealer_play():
 		else:
 			change_player_status('dealer', 'done')
 	
-	print_board(players, True)
+	print_board(True)
 
-def player_play():
+def player_play(name, hand_num=0):
 	"""
 	For now, assumes single player.  Probably will need to take player name as argument later when supporting multiplayer.
 	"""
-	while get_player_status('player') == 'playing':
-		print_board(players, False)
-		print "Player's Turn\n"
-		print_options('player')
+	while get_player_status(name) == 'playing':
+		print_board(False)
+		print "{}'s Turn\n".format(name.title())
+		print_options(name, hand_num)
 		move = raw_input("Enter the number for the move you want to make: ").strip()
 		
 		#if move is not valid, start loop over
@@ -534,7 +547,7 @@ def player_play():
 			
 		elif move == "2":
 			print "\nPlayer stands. Turn is over."
-			change_player_status('player','done')
+			change_player_status('player','done') #may need to change for split
 		
 		elif move == "3":
 			process_double('player')
@@ -589,7 +602,7 @@ def play_blackjack():
 		
 	#*** PLAYER GAME LOOP START ***
 		
-	player_play()
+	player_play('player')
 			
 	#*** DEALER GAME LOOP START ***	
 		

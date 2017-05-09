@@ -1,9 +1,9 @@
 In Progress
+- allow for splitting pairs
 
 
 Backlog
-- allow for splitting pairs
-- multiple players
+- multiple players (think about how board prints...show as player's turns happen?)
 - hide card dealt from doubling down
 - option to use multiple decks
 - insurance if dealer is showing A
@@ -25,12 +25,43 @@ MVP
 
 
 ----------------------------------------------------------------------------------------------
+***PLAYER DICTIONARY***
+hand: []
+money: int
+bet: int
+status: string (playing, loss, done)
+
+----------------------------------------------------------------------------------------------
 ***RULES DICTIONARY***
 min_bet: 1
 win: 1
 blackjack: 1.5
 loss: -1
 doubling_allowed: [10, 11]
+
+----------------------------------------------------------------------------------------------
+***SPLITTING PSEUDOCODE***
+
+Things to Track:
+- which card was split 
+- which hand has been processed
+
+Code Outline:
+
+[fn] check if hand can be split
+	- if yes, show option in player options list to split
+	- if no, do not show option in player options list
+
+[fn-edit] check_valid_move 
+	- if player selects option to split, check whether it is a valid move for that hand
+	- if yes, continue. otherwise, have player select another option
+
+if player chooses to split
+	- check if player has enough money to do so
+		- if yes, continue
+		- if no...continue anyway?
+	- split hand into two hands
+		- process each hand separately
 
 ----------------------------------------------------------------------------------------------
 ***DOUBLING PSEUDOCODE***

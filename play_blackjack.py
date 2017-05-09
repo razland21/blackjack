@@ -40,6 +40,33 @@ def check_double(name):
 	
 	return sum_cards(name) in rules['doubling_allowed'] and len(players[name]['hand']) == 2
 
+def process_double(name):
+	"""
+	Player has requested to double
+	"""
+	if not check_double(name):
+		print "You cannot double down on this hand."
+		return
+	elif not check_funding(name, players[name]['bet']*2):
+		print "You don't have enough money for this... but we'll let you do it anyway."
+	
+	set_bet(name, players[name]['bet']*2)
+	hit(name, used_cards_indices)
+	print "Card dealt - turn is over."
+	if check_busted(name):
+		print_board(players, True)
+		print "Busted! You lose."
+		change_total_money(name, calculate_change(name,'loss'))
+		change_player_status(name, 'loss')				
+	else:
+		change_player_status(name, 'done')
+	
+def process_split(name):
+	"""
+	Player has requested to split
+	"""
+	print "You have requested to split...but this game doesn't do that yet. Please do something else."
+	return
 
 #BETTING
 
@@ -338,6 +365,8 @@ def print_options(name):
 	print "    2 - Stand"
 	if check_double(name):
 		print "    3 - Double"
+	if check_split(name):
+		print "    4 - Split"
 	print ""
 
 def check_valid_move(move):
@@ -355,7 +384,7 @@ def check_valid_move(move):
 	elif not move.isdigit():
 		print "You must enter a number."
 		return False
-	elif int(move) > 3:
+	elif int(move) > 4:
 		print "You must enter one of the numbers above."
 		return False
 	else:
@@ -418,6 +447,24 @@ def reset_board():
 		players[person]['bet'] = 0
 		players[person]['status'] = "playing"
 
+def process_hit(name):
+	"""
+	Player has requested to hit.
+	"""
+	print "\n{} hits.".format(name.title())
+	hit(name, used_cards_indices)
+	if check_busted(name):
+		print_board(players, True)
+		print "Busted! You lose."
+		change_total_money(name, calculate_change(name,'loss'))
+		change_player_status(name, 'loss')
+		
+	elif check_21(name):
+		print_board(players, False)
+		print "You have 21. Turn is over."
+		change_player_status(name,'done')
+
+		
 def dealer_play():
 	print "\nDealer's Turn\n"
 	
@@ -444,42 +491,19 @@ def player_play():
 			continue
 	
 		if move == "1":
-			print "\nPlayer hits."
-			hit('player', used_cards_indices)
-			if check_busted('player'):
-				print_board(players, True)
-				print "Busted! You lose."
-				change_total_money('player', calculate_change('player','loss'))
-				change_player_status('player', 'loss')
-				
-			elif check_21('player'):
-				print_board(players, False)
-				print "You have 21. Turn is over."
-				change_player_status('player','done')
+			process_hit('player')
 			
 		elif move == "2":
 			print "\nPlayer stands. Turn is over."
 			change_player_status('player','done')
 		
-		elif move =="3":
-			if not check_double('player'):
-				print "You cannot double down on this hand."
-				continue
-			elif not check_funding('player', players['player']['bet']*2):
-				print "You don't have enough money for this... but we'll let you do it anyway."
-			
-			set_bet('player', players['player']['bet']*2)
-			hit('player', used_cards_indices)
-			print "Card dealt - turn is over."
-			if check_busted('player'):
-				print_board(players, True)
-				print "Busted! You lose."
-				change_total_money('player', calculate_change('player','loss'))
-				change_player_status('player', 'loss')				
-			else:
-				change_player_status('player', 'done')
+		elif move == "3":
+			process_double('player')
 		
+		elif move == "4":
+			process_split('player')
 	
+
 
 #MAIN GAME
 

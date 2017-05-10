@@ -1,7 +1,15 @@
+BUGS
+[+] 1. Double after split: Hand 2 printed after hand 1, but before hand 2 turn.  [DAS-bugs.txt, line 92]
+[-] 2. Double after split: I hit 21, so it told me that. I shouldn't announce it when doubling.  It should say card dealt [DAS-bugs.txt, line 102]
+[] 3. After doubling, needs to say that turn is over.  (encountered this during double after split -- see DAS-bugs.txt, 2nd dump)
+[] 4. Calculate_change() needs to take into account which bet to change with!
+
 In Progress
 
+
 Backlog
-- create get_player_hands() to get all hands of a player or specific hand if num is provided.
+- add a check in player_play() for 21.  Right now, if player splits hands, then gets 21 on a split, player is prompted to hit/stand.
+- create get_hand() to get all hands of a player or specific hand if num is provided.
 - optimize used_cards_indices: make into a list of 1/0 to indicate whether a card has been used or not (each index corresponds to the index of the card, so used_cards[num] = 1)
 - multiple players 
 ---> think about how board prints...show as player's turns happen?
@@ -11,6 +19,7 @@ Backlog
 - insurance if dealer is showing A
 - change settings for rules
 - player(s) can input their own name
+- bets can be floats
 
 
 Completed
@@ -40,7 +49,7 @@ MVP
 hand: [[]] - a list of a list containing cards
 money: [int] - a list of ints, one for each hand
 bet: int
-status: string (playing, loss, done, double) **one for each hand?!**
+status: [string] - playing, win, loss, done, doubling
 
 ----------------------------------------------------------------------------------------------
 ***RULES DICTIONARY***

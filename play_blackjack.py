@@ -94,12 +94,13 @@ def process_double(name, hand_num=0):
 	set_bet(name, get_bet(name, hand_num)*2)
 	change_player_status(name, 'doubling', hand_num)
 	hit(name, used_cards_indices, hand_num)
-	
 
 	if check_busted(name, hand_num):
 		change_player_status(name, 'loss', hand_num) 
 	else:
-		change_player_status(name, 'done', hand_num) 	
+		change_player_status(name, 'done', hand_num) 
+	
+	print "You have doubled on this hand. Turn is over."
 	
 
 
@@ -412,7 +413,7 @@ def check_busted(name, hand_num=0):
 	
 	if busted:
 		if get_player_status(name, hand_num) == 'playing':
-			print "Busted. Turn over."
+			print "Busted. Turn is over."
 	
 	return busted
 		

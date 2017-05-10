@@ -1,7 +1,5 @@
 BUGS
-[+] 1. Double after split: Hand 2 printed after hand 1, but before hand 2 turn.  [DAS-bugs.txt, line 92]
 [-] 2. Double after split: I hit 21, so it told me that. I shouldn't announce it when doubling.  It should say card dealt [DAS-bugs.txt, line 102]
-[] 3. After doubling, needs to say that turn is over.  (encountered this during double after split -- see DAS-bugs.txt, 2nd dump)
 [] 4. Calculate_change() needs to take into account which bet to change with!
 
 In Progress
@@ -21,8 +19,9 @@ Backlog
 - player(s) can input their own name
 - bets can be floats
 
+--------------------------------
 
-Completed
+Completed Tasks
 + main menu
 + betting
 + allow for doubling down on 10/11 (supports any rules defined in dictionary)
@@ -35,7 +34,12 @@ Completed
 ---> if player status == loss, no need to recheck win
 + change all printing of results to include player/hand names for clarity
 + change check_winner() to handle checking split hands
-	
+
+
+Completed Bugs
+[+] 1. Double after split: Hand 2 printed after hand 1, but before hand 2 turn.  [DAS-bugs.txt, line 92]
+[+] 3. After doubling, needs to say that turn is over.  (encountered this during double after split -- see DAS-bugs.txt, 2nd dump, also happens for regular doubles)
+
 
 MVP
 + single player: 1 player vs AI

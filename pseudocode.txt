@@ -1,12 +1,11 @@
 In Progress
-- change check_winner() to handle checking split hands
-- further testing on splitting 
-- change all printing of results to include player/hand names for clarity
 
 Backlog
-- create get_player_hands() to get all hands of a player.
+- create get_player_hands() to get all hands of a player or specific hand if num is provided.
 - optimize used_cards_indices: make into a list of 1/0 to indicate whether a card has been used or not (each index corresponds to the index of the card, so used_cards[num] = 1)
-- multiple players (think about how board prints...show as player's turns happen?)
+- multiple players 
+---> think about how board prints...show as player's turns happen?
+---> need to convert players into list since order will matter
 - hide card dealt from doubling down
 - option to use multiple decks
 - insurance if dealer is showing A
@@ -23,6 +22,10 @@ Completed
 + change print_board() to handle printing split hands
 + allow for splitting pairs
 ---> need to review process_split - finish writing.
++ make all end game fall into check_winner (i.e. if dealer has 21, change everyone's status to loss)
+---> if player status == loss, no need to recheck win
++ change all printing of results to include player/hand names for clarity
++ change check_winner() to handle checking split hands
 	
 
 MVP

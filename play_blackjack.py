@@ -366,18 +366,20 @@ def check_anyone_has_21():
 		#single player - assuming game automatically over if one of them have 21, so show dealer hand
 		#MP -- remove check from here, change status only.
 		print_board(True)
-		
+
+	#	LINES MOVED TO CHECK_WINNER()
+	
 		if dealer_has_21 and player_has_21:
 			print "Both of you have 21.  Draw."
 			change_player_status('player','done')
 		elif dealer_has_21:
-			print "Sorry, dealer has 21.  You lose."
+	#		print "Sorry, dealer has 21.  You lose."
 			change_player_status('player','loss')
-			change_total_money('player', calculate_change('player','loss'))
+	#		change_total_money('player', calculate_change('player','loss'))
 		elif player_has_21:
-			print "Player has Blackjack! You win!"
+	#		print "Player has Blackjack! You win!"
 			change_player_status('player','done')
-			change_total_money('player', calculate_change('player','blackjack'))
+	#		change_total_money('player', calculate_change('player','blackjack'))
 		return True
 	else:
 		return False
@@ -485,6 +487,13 @@ def dealer_must_hit():
 		return True
 	else:
 		return sum_cards('dealer') < 17
+
+def check_dealer_won(name, num):
+	"""
+	check if dealer won a given hand
+	"""
+	return sum_cards(name, num) < sum_cards('dealer') and not check_busted('dealer')
+	
 	
 def check_winner():
 	"""
@@ -495,16 +504,37 @@ def check_winner():
 	print "----------------------\n"
 	
 	for num in range(len(players['player']['hand'])):
-		if sum_cards('player', num) < sum_cards('dealer') and not check_busted('dealer'):
+		print "PLAYER - HAND {}:".format(num+1)
+		
+		if check_busted('player', num):
+			print "Busted! You lose."
+			change_total_money('player', calculate_change('player','loss'))
+		
+		elif get_player_status('player', num) == 'loss':
+			if check_21('dealer'):
+				print "Sorry, dealer has 21.  You lose."
+			else: 
+				print "You lose."
+			change_total_money('player', calculate_change('player','loss'))
+
+		elif check_dealer_won('player', num):
 			print "Sorry, dealer won."
 			change_total_money('player', calculate_change('player', 'loss'))
+
 		elif sum_cards('player', num) == sum_cards('dealer'):
 			print "Push.\n"
+
+		elif check_21('player') and len(players['player']['hand'][num]) == 2:
+			print "Player has Blackjack! You win!"
+			change_total_money('player', calculate_change('player','blackjack'))
+			
 		else:
 			if check_busted('dealer'):				
-				print "Dealer busted! Player wins!\n"
+				print "Dealer busted! Player wins!"
+				
 			elif sum_cards('player', num) > sum_cards('dealer'):
-				print "Congratulations, player wins!\n"
+				print "Congratulations, player wins!"
+				
 			change_total_money('player', calculate_change('player', 'win'))
 
 			
@@ -536,9 +566,7 @@ def process_hit(name, hand_num=0):
 	print "\n{} hits.".format(name.title())
 	hit(name, used_cards_indices, hand_num)
 	if check_busted(name, hand_num):
-		print_board(True)  #This probably changes for multiplayer
-		print "Busted! You lose."
-		change_total_money(name, calculate_change(name,'loss'))
+		print_board(True)  #changes for MP?
 		change_player_status(name, 'loss', hand_num)
 		
 	elif check_21(name, hand_num):
@@ -629,8 +657,8 @@ def play_blackjack():
 		players[person]['hand'][0] = deal_cards(2,used_cards_indices)
 				
 	#check if anyone has 21
-	if check_anyone_has_21():
-		return
+	check_anyone_has_21()
+	
 		
 	#*** PLAYER GAME LOOP START ***
 	
@@ -638,11 +666,14 @@ def play_blackjack():
 	while 'playing' in players['player']['status']:
 		player_play('player', players['player']['status'].index('playing'))
 			
-	#*** DEALER GAME LOOP START ***	
-		
-	if get_player_status('player') != 'loss':
-		dealer_play()
-		check_winner()				
+	#*** DEALER GAME LOOP START ***		
+
+	for status in players['player']['status']:
+		if status != 'loss':
+			dealer_play()
+			break
+	
+	check_winner()				
 	
 		
 #START GAME

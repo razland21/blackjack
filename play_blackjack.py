@@ -43,7 +43,7 @@ def split_hands(name, hand_num=0):
 	players[name]['hand'].append(new_hand)
 	
 	hit(name, used_cards_indices, hand_num)
-	hit(name, used_cards_indices, len(players[name]['hand'])-1)
+	hit(name, used_cards_indices, -1)
 	
 	# Add new bet to bet list.  Assumes equal to bet of hand being split.
 	players[name]['bet'].append(players[name]['bet'][hand_num])
@@ -185,7 +185,7 @@ def calculate_change(name, rule, bet_num=0):
 	total = 0
 	
 	if rule in rules:
-		total = players[name]['bet'][bet_num] * rules[rule]
+		total = get_bet(name, bet_num) * rules[rule]
 	else:
 		print "{} is an invalid rule. No change will be made to {}'s total".format(rule, name)
 	
@@ -512,39 +512,39 @@ def check_winner():
 	print " *** GAME RESULTS ***"
 	print "----------------------\n"
 	
-	for num in range(len(get_hand('player'))):
-		print "PLAYER - HAND {}:".format(num+1)
+	for hand_index in range(len(get_hand('player'))):
+		print "PLAYER - HAND {}:".format(hand_index+1)
 		
-		if check_busted('player', num):
+		if check_busted('player', hand_index):
 			print "Busted! You lose."
-			change_total_money('player', calculate_change('player','loss'))
+			change_total_money('player', calculate_change('player','loss', hand_index))
 		
-		elif get_player_status('player', num) == 'loss':
+		elif get_player_status('player', hand_index) == 'loss':
 			if check_21('dealer'):
 				print "Sorry, dealer has 21.  You lose."
 			else: 
 				print "You lose."
-			change_total_money('player', calculate_change('player','loss'))
+			change_total_money('player', calculate_change('player','loss', hand_index))
 
-		elif check_dealer_won('player', num):
+		elif check_dealer_won('player', hand_index):
 			print "Sorry, dealer won."
-			change_total_money('player', calculate_change('player', 'loss'))
+			change_total_money('player', calculate_change('player', 'loss', hand_index))
 
-		elif sum_cards('player', num) == sum_cards('dealer'):
+		elif sum_cards('player', hand_index) == sum_cards('dealer'):
 			print "Push.\n"
 
 		elif check_blackjack('player'):
 			print "Player has Blackjack! You win!"
-			change_total_money('player', calculate_change('player','blackjack'))
+			change_total_money('player', calculate_change('player','blackjack', hand_index))
 			
 		else:
 			if check_busted('dealer'):				
 				print "Dealer busted! Player wins!"
 				
-			elif sum_cards('player', num) > sum_cards('dealer'):
+			elif sum_cards('player', hand_index) > sum_cards('dealer'):
 				print "Congratulations, player wins!"
 				
-			change_total_money('player', calculate_change('player', 'win'))
+			change_total_money('player', calculate_change('player', 'win', hand_index))
 
 			
 def change_player_status(name, status, hand_num=0):

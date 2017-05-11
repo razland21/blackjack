@@ -1,13 +1,14 @@
 BUGS
 [-] 2. Double after split: I hit 21, so it told me that. I shouldn't announce it when doubling.  It should say card dealt [DAS-bugs.txt, line 102]
-[] 4. Calculate_change() needs to take into account which bet to change with!
+[-] 4. Calculate_change() needs to take into account which bet to change with!
+[] 5. if player splits hands, then gets 21 on a split, player is prompted to hit/stand.  should move forward.  [DAS-bugs.txt, dump 3]  If first two cards are dealt, and third one is dealt to get 21, it works fine.
+---> add a check in player_play() for 21. 
 
 In Progress
 
 
 Backlog
-- add a check in player_play() for 21.  Right now, if player splits hands, then gets 21 on a split, player is prompted to hit/stand.
-- create get_hand() to get all hands of a player or specific hand if num is provided.
+
 - optimize used_cards_indices: make into a list of 1/0 to indicate whether a card has been used or not (each index corresponds to the index of the card, so used_cards[num] = 1)
 - multiple players 
 ---> think about how board prints...show as player's turns happen?
@@ -34,6 +35,7 @@ Completed Tasks
 ---> if player status == loss, no need to recheck win
 + change all printing of results to include player/hand names for clarity
 + change check_winner() to handle checking split hands
++ create get_hand() to get all hands of a player or specific hand if num is provided.
 
 
 Completed Bugs

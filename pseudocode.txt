@@ -2,6 +2,8 @@ BUGS
 [-] 2. Double after split: I hit 21, so it told me that. I shouldn't announce it when doubling.  It should say card dealt [DAS-bugs.txt, line 102]
 [-] 5. if player splits hands, then gets 21 on a split, player is prompted to hit/stand.  should move forward.  [DAS-bugs.txt, dump 3]  If first two cards are dealt, and third one is dealt to get 21, it works fine.
 ---> add a check in player_play() for 21. 
+[] 6. Split then bust, board doesn't print to show busted card.  [DAS-bugs.txt, dump 4]
+[-] 7. Full board is printing twice. [DAS-bugs.txt, dump 4]
 
 In Progress
 
@@ -16,6 +18,7 @@ Backlog
 - change settings for rules
 - player(s) can input their own name
 - bets can be floats
+- how to handle both player and dealer having blackjack?  Currently draw.
 
 --------------------------------
 
@@ -53,15 +56,23 @@ MVP
 hand: [[]] - a list of a list containing cards
 money: [int] - a list of ints, one for each hand
 bet: int
-status: [string] - playing, win, loss, done, doubling
+status: [string] - playing, win, loss, done, doubling, draw
 
 ----------------------------------------------------------------------------------------------
 ***RULES DICTIONARY***
+-min_bet: int value
+-win/blackjack/loss: multipliers
+-doubling_allowed: list of cards where doubling down is allowed
+-shuffle: min number of cards left in deck to be able to do another round (i.e. if current deck is less than this, then shuffle)
+-num_decks: number of decks to be used in-game (currently does nothing)
+
 min_bet: 1
 win: 1
 blackjack: 1.5
 loss: -1
 doubling_allowed: [10, 11]
+shuffle: 15
+num_decks: 1
 
 ----------------------------------------------------------------------------------------------
 ***SPLITTING PSEUDOCODE***

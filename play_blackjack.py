@@ -1,4 +1,4 @@
-from random import randint, shuffle
+from random import shuffle
 
 deck_template = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'),(10,'H'),('J','H'),('Q','H'),('K','H'),
 ('A','D'),(2,'D'),(3,'D'),(4,'D'),(5,'D'),(6,'D'),(7,'D'),(8,'D'),(9,'D'),(10,'D'),('J','D'),('Q','D'),('K','D'),
@@ -16,14 +16,20 @@ players = {'dealer': {'hand': [[]], 'money': 0, 'bet': [0], 'status': ['playing'
 #win/blackjack/loss: multipliers
 #doubling_allowed: list of cards where doubling down is allowed
 #shuffle: min number of cards left in deck to be able to do another round (i.e. if current deck is less than this, then shuffle)
+#num_decks: number of decks to be used in-game (currently changes nothing)
 
-rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed': [10, 11], 'shuffle': 15}
+rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed': [10, 11], 'shuffle': 15, 'num_decks': 1}
 
 #SPLITTING
 
 def check_split(name, hand_num=0):
 	"""
 	Check whether player can split his/her hand.  Players can only split of the values of the two cards are exactly the same.
+	Arguments:
+	- name: a string representing the player
+	- hand: a list of cards representing the hand to add a card to
+	Returns:
+	- True if hand can be split. False otherwise.
 	"""
 	
 	if len(players[name]['hand'][hand_num]) > 2:
@@ -34,7 +40,10 @@ def check_split(name, hand_num=0):
 		
 def split_hands(name, hand_num=0):
 	"""
-	Split the hand into two separate hands and create separate bets for each hand.
+	Splits the player's hand into two separate hands and create separate bets for each hand.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	"""
 	# Split the hands.
 	card = players[name]['hand'][hand_num].pop()
@@ -55,10 +64,11 @@ def split_hands(name, hand_num=0):
 
 def process_split(name, hand_num=0):
 	"""
-	Player has requested to split
+	This function runs when player selects option to split.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	"""
-	# TEMP: remove later.
-	# print "You have requested to split...but this game doesn't do that yet. Please do something else."
 	
 	if not check_split(name):
 		print "You cannot split this hand."
@@ -66,8 +76,6 @@ def process_split(name, hand_num=0):
 		print "You don't have enough money for this... but we'll let you do it anyway."
 
 	split_hands(name, hand_num)
-	
-	return
 		
 		
 #DOUBLING
@@ -75,17 +83,22 @@ def process_split(name, hand_num=0):
 def check_double(name, hand_num=0):
 	"""
 	Check whether player can double down on his/her hand.  Players can only double if the sum of the *original* hand equals one of the numbers in the 'doubling_allowed' rule.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	"""
 	
-	return sum_cards(name, hand_num) in rules['doubling_allowed'] and len(players[name]['hand'][hand_num]) == 2
+	return sum_cards(name, hand_num) in rules['doubling_allowed'] and len(get_hand(name, hand_num)) == 2
 
 	
 def process_double(name, hand_num=0):
 	"""
-	Player has requested to double
-	Assumptions:
-	- Assuming doubling on first hand.
+	This function runs when player selects option to double.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	"""
+	
 	if not check_double(name, hand_num):
 		print "You cannot double down on this hand."
 		return
@@ -95,14 +108,15 @@ def process_double(name, hand_num=0):
 	set_bet(name, get_bet(name, hand_num)*2)
 	change_player_status(name, 'doubling', hand_num)
 	hit(name, deck, hand_num)
+	
+	print_board(False, hand_num,len(get_hand(name, hand_num))-1)
+	print "\nYou have doubled on this hand. Turn is over."
 
 	if check_busted(name, hand_num):
 		change_player_status(name, 'loss', hand_num) 
 	else:
 		change_player_status(name, 'done', hand_num) 
 	
-	print_board(False,hand_num,len(get_hand(name, hand_num))-1)
-	print "You have doubled on this hand. Turn is over."
 	
 
 
@@ -112,7 +126,7 @@ def check_valid_bet(bet):
 	"""
 	Checks whether user input represents a valid bet
 	Arguments:
-	- move: string representing a bet.
+	- move: string representing a bet
 	Returns:
 	- True if bet is valid. False otherwise.
 	Assumptions:
@@ -128,6 +142,7 @@ def check_valid_bet(bet):
 	else:
 		return True
 
+		
 def check_funding(name, bet):
 	"""
 	Checks whether player can afford placing the bet
@@ -144,6 +159,10 @@ def check_funding(name, bet):
 def get_bet(name, bet_num=0):
 	"""
 	Get value of current bet for a player's hand
+	Arguments:
+	- name: a string representing the player
+	- bet_num: an int representing the position of the bet in the player's bet list. Default is 0 (first bet).
+
 	"""
 	
 	return players[name]['bet'][bet_num]
@@ -153,8 +172,9 @@ def set_bet(name, bet, bet_num=0):
 	"""
 	Sets bet for player.
 	Arguments:
-	- name: string representing the name of the player
+	- name: a string representing the player
 	- bet: int representing amount player wants to bet
+	- bet_num: an int representing the position of the bet in the player's bet list. Default is 0 (first bet).
 	"""
 	
 	players[name]['bet'][bet_num] = bet
@@ -165,7 +185,7 @@ def change_total_money(name, amount):
 	"""
 	Changes total money available for player by given amount.
 	Arguments:
-	- name: string representing the name of the player
+	- name: string representing the player
 	- amount: a float representing the amount that the player's total should change by
 	"""
 	
@@ -178,10 +198,11 @@ def calculate_change(name, rule, bet_num=0):
 	"""
 	Calculates how much the total money of a player should change by based on end result of game.
 	Arguments:
-	- name: string representing the name of the player
+	- name: string representing the player
 	- rule: string representing the rule to follow (must be a key in 'rules' dictionary)
+	- bet_num: an int representing the position of the bet in the player's bet list. Default is 0 (first bet).
 	Returns:
-	- total: the amount of money that needs to be added to a player's total.  (negative number means it will be subtracted)
+	- total: the amount of money that needs to be added to a player's total. (negative number means it will be subtracted)
 	"""
 
 	total = 0
@@ -196,47 +217,50 @@ def calculate_change(name, rule, bet_num=0):
 
 #MAIN SUPPORTING FUNCTIONS
 
-def shuffle_deck(deck):
+def shuffle_deck(deck_lst):
 	"""
+	Shuffles the game's deck of cards.
 	Arguments: 
-	- deck: deck of cards used during game
+	- deck_lst: a list representing the deck of cards used during game
 	"""
 	
 	#clear deck
-	del deck[0:]
+	del deck_lst[0:]
 	
 	#create new shuffled deck, currently assuming single deck
 	card_indices = range(52)
 	shuffle(card_indices)
 	
 	for index in card_indices:
-		deck.append(deck_template[index])
+		deck_lst.append(deck_template[index])
 		
 	print "Cards have been shuffled.\n"
 	
 	
 def deal_cards(num_cards, deck_lst):
 	"""
+	Deals a given number of cards from the given card deck.
 	Arguments: 
 	- num_cards: an int representing the number of cards to deal
 	- deck_lst: a list representing the current deck of cards
-	
 	Returns:
-	- cards: a list of cards representing new cards to be added to a hand
+	- dealt_cards: a list of cards representing new cards to be added to a hand
 	"""
-	cards_to_deal = []
+	dealt_cards = []
 	
-	while len(cards_to_deal) < num_cards:
-		cards_to_deal.append(deck_lst.pop())
+	while len(dealt_cards) < num_cards:
+		dealt_cards.append(deck_lst.pop())
 	
-	return cards_to_deal
+	return dealt_cards
 	
 	
 def print_board(show_dealer_hand, hand_num="All", hidden_card="No"):
 	"""
+	Prints current game board.
 	Arguments:
-	- all_players: a dictionary representing all players in current game
 	- show_dealer_hand: a boolean representing whether to show or hide the dealer's first card. True = show card.
+	- hand_num: an int representing the position of the hand in the player's hand list or a string representing all hands to be shown. Default is "All" (full list of hands).
+	- hidden_card: an int representing the position of a card that should be hidden or a string representing all cards to be shown. Default is "No" (full list of cards).
 	"""
 	print "\n***DEALER***"
 	if show_dealer_hand:
@@ -246,7 +270,6 @@ def print_board(show_dealer_hand, hand_num="All", hidden_card="No"):
 	else:
 		print_hand('dealer', 0, 0)
 
-	#to add: if player status = double, hide last card and total.	
 	#only works for single player...probably need to pass in player as argument
 	
 	if type(hand_num) == int:
@@ -258,13 +281,41 @@ def print_board(show_dealer_hand, hand_num="All", hidden_card="No"):
 			
 			
 def print_player_board(name, hand_num=0, hidden_card="No"):
-			print "\n\n***PLAYER - HAND {}***".format(hand_num+1)
-			print_hand('player', hand_num, hidden_card)
+	"""
+	Prints board for a given player.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
+	- hidden_card: an int representing the position of a card that should be hidden or a string representing all cards to be shown. Default is "No" (full list of cards).
+	"""
+	
+	print "\n\n***PLAYER - HAND {}***".format(hand_num+1)
+	print_hand(name, hand_num, hidden_card)
 
-			print "\nHand {} Total: {}\n".format(hand_num+1, sum_cards('player', hand_num))		
+	if get_player_status(name, hand_num) != "doubling":
+		print_total(name, hand_num)
 			
+			
+def print_total(name, hand_num=0):
+	"""
+	Prints total of a hand for a given player.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
+	"""
+	
+	print "\nHand {} Total: {}\n".format(hand_num+1, sum_cards(name, hand_num))		
 
+	
 def get_hand(name, hand_num="All"):
+	"""
+	Returns a hand for a given player.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list or a string representing all hands to be shown. Default is "All" (full list of hands).
+	Returns:
+	- a list representing a specific hand for a player or list of lists if hand_num="All"
+	"""
 	if type(hand_num) == int:
 		return players[name]['hand'][hand_num]
 	else:
@@ -273,8 +324,13 @@ def get_hand(name, hand_num="All"):
 
 def print_hand(name, hand_num=0, hidden_card="No"):
 	"""
-	Print hand of player in picture form
+	Print hand of player in picture form.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
+	- hidden_card: an int representing the position of a card that should be hidden or a string representing all cards to be shown. Default is "No" (full list of cards).
 	"""
+	
 	hand = players[name]['hand'][hand_num]
 	hand_len = len(hand)
 	
@@ -307,7 +363,8 @@ def highest_sum_cards(name, hand_num=0):
 	"""
 	Calculates highest possible sum of cards.  This is to determine how to handle Ace cards in hands. 
 	Arguments:
-	- name: a string representing the name of player whose hand to check 
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	Returns:
 	- sum_hand: sum of the values of all cards in hand
 	"""
@@ -333,18 +390,12 @@ def highest_sum_cards(name, hand_num=0):
 def	sum_cards(name, hand_num=0):
 	"""
 	Arguments:
-	- name: a string representing the name of player whose hand to check  
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	Returns:
 	- sum_hand: sum of the values of all cards in hand
-	Assumptions: 
-	- A = 11 by default. If multiple Aces in hand, all other Aces count as 1.
-	
-	>>> sum_cards([("A","H"),("A","D"),("A","S"),(10,"H")])
-	13
-	>>> sum_cards([("A","H"),("A","D"),(10,"H")])
-	12
-	>>> sum_cards([("A","H"),(2,"D"),(3,"H"),("A","S")])
-	17
+	Notes: 
+	- A = 11 by default unless that causes player to bust. If multiple Aces in hand, all other Aces count as 1.
 	"""
 	sum_hand = highest_sum_cards(name, hand_num)
 	added_ace = has_ace(name, hand_num)
@@ -361,7 +412,8 @@ def check_21(name, hand_num=0):
 	"""
 	Checks whether the given player's hand has a value of 21.
 	Arguments:
-	- name: a string representing the person whose hand to check
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	Returns:
 	- True if value of hand is 21. False otherwise.
 	"""
@@ -370,24 +422,29 @@ def check_21(name, hand_num=0):
 
 def check_blackjack(name):
 	"""
-	Check if a player has blackjack
+	Check if a player has blackjack. Blackjack only happens during initial card dealing (i.e. first hand)
+	Arguments:
+	- name: a string representing the player
+	Returns:
+	- True if player meets conditions of blackjack. False otherwise.
 	"""
 	return check_21(name) and len(get_hand(name)) == 1 and len(get_hand(name, 0)) == 2
 	
 def check_anyone_has_21():
 	"""
 	This check only happens at the beginning of each game - assumes looking at first hand only of each player.
+	Returns:
+	- True if anyone has 21. False otherwise.
+	Note:
+	- Currently only works for single player.
 	"""
 	dealer_has_21 = check_21('dealer')
 	player_has_21 = check_21('player')
 	
-	if dealer_has_21 or player_has_21:
-		#single player - assuming game automatically over if one of them have 21, so show dealer hand
-		print_board(True)
-	
+	if dealer_has_21 or player_has_21:	
 		if dealer_has_21 and player_has_21:
 			print "Both of you have 21.  Draw."
-			change_player_status('player','done')
+			change_player_status('player','draw')
 		elif dealer_has_21:
 			change_player_status('player','loss')
 		elif player_has_21:
@@ -399,10 +456,12 @@ def check_anyone_has_21():
 def has_ace(name, hand_num=0):
 	"""
 	Arguments:
-	- name: a string representing the person whose hand to check
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	Returns:
 	- True if at least one Ace card exists in the hand. False otherwise.
 	"""
+	
 	for card in players[name]['hand'][hand_num]:
 		if 'A' in card:
 			return True
@@ -413,7 +472,8 @@ def check_busted(name, hand_num=0):
 	"""
 	Checks if value of player's hand is greater than 21.
 	Arguments:
-	- name: a string representing the person whose hand to check
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	Returns:
 	- True if hand is greater than 21. False otherwise.
 	"""
@@ -429,26 +489,32 @@ def hit(name, deck_lst, hand_num=0):
 	"""
 	Adds one card from the deck into a player's hand.
 	Arguments:
-	- name: a string representing player
-	- hand: a list of cards representing the hand to add a card to
-	Notes:
-	- deal_cards() returns a list of one card - [0] is added to append the card itself to the hand
+	- name: a string representing the player
+	- deck_lst: a list representing the deck of cards used during game
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	"""
 	
+	#Note: deal_cards() returns a list of one card - [0] is added to append the card itself to the hand
 	players[name]['hand'][hand_num].append(deal_cards(1, deck_lst)[0])
 
-def deck_needs_shuffling(deck):
+	
+def deck_needs_shuffling(deck_lst):
 	"""
 	Checks whether the deck needs to be shuffled based on current rule in rules['shuffle'].
+	Arguments:
+	- deck_lst: a list representing the deck of cards used during game
 	Returns:
 	- True if the deck needs to be shuffled.  False otherwise.
 	"""
 	
-	return len(deck) < rules['shuffle']
+	return len(deck_lst) < rules['shuffle']
 	
 def print_options(name, hand_num=0):
 	"""
 	Prints player's options.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	"""
 	print "Choose from the following options:"
 	print "    1 - Hit"
@@ -483,6 +549,9 @@ def check_valid_move(move):
 def check_soft_17(name, hand_num=0):
 	"""
 	Check if a player's hand is a soft 17 (i.e. hand is 17 because A = 11)
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	"""
 	
 	return highest_sum_cards(name, hand_num) == 17 and has_ace(name, hand_num)
@@ -490,23 +559,27 @@ def check_soft_17(name, hand_num=0):
 def dealer_must_hit():
 	"""
 	Checks if dealer must hit. Dealer must hit if their total is < 17 or if dealer has soft 17.
-	Arguments:
-	- hand: a list of cards representing the hand to add a card to
 	Returns:
 	- True if dealer must hit. False otherwise.
 	"""
 	
-	#check if soft 17, return True
+	#return True if dealer has soft 17
 	if check_soft_17('dealer'):
 		return True
 	else:
 		return sum_cards('dealer') < 17
 
-def check_dealer_won(name, num):
+def check_dealer_won(name, hand_num):
 	"""
-	check if dealer won a given hand
+	Check if dealer won a given hand
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
+	Returns:
+	- True if dealer won. False otherwise.
 	"""
-	return sum_cards(name, num) < sum_cards('dealer') and not check_busted('dealer')
+	
+	return sum_cards(name, hand_num) < sum_cards('dealer') and not check_busted('dealer')
 	
 	
 def check_winner():
@@ -554,20 +627,34 @@ def check_winner():
 			
 def change_player_status(name, status, hand_num=0):
 	"""
-	Change player's status
+	Change player's status.
+	Arguments:
+	- name: a string representing the player
+	- status: a string representing the player's current game status
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand)
 	"""
+	
 	players[name]['status'][hand_num] = status
 
 	
 def get_player_status(name, hand_num=0):
-
+	"""
+	Return player's current  status.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand)
+	Returns:
+	- string representing player's current status
+	"""
 	return players[name]['status'][hand_num]
 
 	
 def reset_board():
 	"""
-	Reset the elements of the board for the next round.  Need to keep total money intact.
+	Reset the elements of the board for the next round.  
+	Keeps total money intact.
 	"""
+	
 	for person in players:
 		players[person]['hand'] = [[]]	
 		players[person]['bet'] = [0]
@@ -577,16 +664,21 @@ def reset_board():
 def process_hit(name, hand_num=0):
 	"""
 	Player has requested to hit.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand)	
 	"""
+	
 	print "\n{} hits.".format(name.title())
 	hit(name, deck, hand_num)
 	
+	#if hitting due to a doubling move, do not show last card until game is over.
 	if get_player_status(name, hand_num) == "doubling":
-		print_board(True, hand_num, len(get_hand(name, hand_num))-1)
+		print_board(False, hand_num, len(get_hand(name, hand_num))-1)
 		print "Card dealt - turn is over."
 	
 	elif check_busted(name, hand_num):
-		print_board(True, hand_num)  #changes for MP?
+#		print_board(False, hand_num)  
 		change_player_status(name, 'loss', hand_num)
 		
 	elif check_21(name, hand_num):
@@ -596,6 +688,10 @@ def process_hit(name, hand_num=0):
 
 		
 def dealer_play():
+	"""
+	Processes gameplay loop for dealer.
+	"""
+	
 	print "\nDealer's Turn\n"
 	
 	while get_player_status('dealer') == 'playing':
@@ -604,13 +700,16 @@ def dealer_play():
 		else:
 			change_player_status('dealer', 'done')
 	
-	print_board(True)
-
+	
 	
 def player_play(name, hand_num=0):
 	"""
 	Processes gameplay loop for a single player.
+	Arguments:
+	- name: a string representing the player
+	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	"""
+	
 	if check_21(name, hand_num=0):
 		change_player_status(name,'done',hand_num)
 		
@@ -697,18 +796,26 @@ def play_blackjack():
 			dealer_play()
 			break
 	
+	print_board(True)
 	check_winner()				
 	
-		
-#START GAME
+
+#START PROGRAM	
 
 def print_main_menu():
+	"""
+	Print main menu options
+	"""
 	print "Select from one of the following options:"
 	print "    1: Play Blackjack"
 	print "    2: Quit"
 	print ""
-	
+
+
 def start_game():
+	"""
+	Main function to start program
+	"""
 	print "\nWELCOME TO BLACKJACK! \n"
 	
 	while True:

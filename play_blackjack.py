@@ -477,13 +477,9 @@ def check_busted(name, hand_num=0):
 	Returns:
 	- True if hand is greater than 21. False otherwise.
 	"""
-	busted = sum_cards(name, hand_num) > 21
 	
-	if busted:
-		if get_player_status(name, hand_num) == 'playing':
-			print "Busted. Turn is over."
+	return sum_cards(name, hand_num) > 21
 	
-	return busted
 		
 def hit(name, deck_lst, hand_num=0):
 	"""
@@ -675,10 +671,11 @@ def process_hit(name, hand_num=0):
 	#if hitting due to a doubling move, do not show last card until game is over.
 	if get_player_status(name, hand_num) == "doubling":
 		print_board(False, hand_num, len(get_hand(name, hand_num))-1)
-		print "Card dealt - turn is over."
+		print "Card dealt. Turn is over."
 	
 	elif check_busted(name, hand_num):
-#		print_board(False, hand_num)  
+		print_board(False, hand_num) 
+		print "Busted. Turn is over."
 		change_player_status(name, 'loss', hand_num)
 		
 	elif check_21(name, hand_num):

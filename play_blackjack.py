@@ -1,12 +1,13 @@
-from random import randint
+from random import randint, shuffle
 
-deck = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'),(10,'H'),('J','H'),('Q','H'),('K','H'),
+deck_template = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'),(10,'H'),('J','H'),('Q','H'),('K','H'),
 ('A','D'),(2,'D'),(3,'D'),(4,'D'),(5,'D'),(6,'D'),(7,'D'),(8,'D'),(9,'D'),(10,'D'),('J','D'),('Q','D'),('K','D'),
 ('A','C'),(2,'C'),(3,'C'),(4,'C'),(5,'C'),(6,'C'),(7,'C'),(8,'C'),(9,'C'),(10,'C'),('J','C'),('Q','C'),('K','C'),
 ('A','S'),(2,'S'),(3,'S'),(4,'S'),(5,'S'),(6,'S'),(7,'S'),(8,'S'),(9,'S'),(10,'S'),('J','S'),('Q','S'),('K','S')]
 
+deck = []
+
 #main game data tracking
-used_cards_indices = []
 players = {'dealer': {'hand': [[]], 'money': 0, 'bet': [0], 'status': ['playing']}, 
 	'player': {'hand': [[]], 'money': 100, 'bet': [0], 'status': ['playing']}}
 
@@ -14,9 +15,9 @@ players = {'dealer': {'hand': [[]], 'money': 0, 'bet': [0], 'status': ['playing'
 #min_bet: int value
 #win/blackjack/loss: multipliers
 #doubling_allowed: list of cards where doubling down is allowed
-#shuffle: min number of cards already used before shuffling has to happen
+#shuffle: min number of cards left in deck to be able to do another round (i.e. if current deck is less than this, then shuffle)
 
-rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed': [10, 11], 'shuffle': 40}
+rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed': [10, 11], 'shuffle': 15}
 
 #SPLITTING
 
@@ -42,8 +43,8 @@ def split_hands(name, hand_num=0):
 
 	players[name]['hand'].append(new_hand)
 	
-	hit(name, used_cards_indices, hand_num)
-	hit(name, used_cards_indices, -1)
+	hit(name, deck, hand_num)
+	hit(name, deck, -1)
 	
 	# Add new bet to bet list.  Assumes equal to bet of hand being split.
 	players[name]['bet'].append(players[name]['bet'][hand_num])
@@ -93,7 +94,7 @@ def process_double(name, hand_num=0):
 	
 	set_bet(name, get_bet(name, hand_num)*2)
 	change_player_status(name, 'doubling', hand_num)
-	hit(name, used_cards_indices, hand_num)
+	hit(name, deck, hand_num)
 
 	if check_busted(name, hand_num):
 		change_player_status(name, 'loss', hand_num) 
@@ -195,34 +196,40 @@ def calculate_change(name, rule, bet_num=0):
 
 #MAIN SUPPORTING FUNCTIONS
 
-def shuffle_deck(used_cards):
+def shuffle_deck(deck):
 	"""
 	Arguments: 
-	- used_cards: a list of indices representing cards already used in deck
+	- deck: deck of cards used during game
 	"""
-	del used_cards[0:]
+	
+	#clear deck
+	del deck[0:]
+	
+	#create new shuffled deck, currently assuming single deck
+	card_indices = range(52)
+	shuffle(card_indices)
+	
+	for index in card_indices:
+		deck.append(deck_template[index])
+		
 	print "Cards have been shuffled.\n"
 	
 	
-def deal_cards(num_cards, used_cards):
+def deal_cards(num_cards, deck_lst):
 	"""
 	Arguments: 
 	- num_cards: an int representing the number of cards to deal
-	- used_cards: a list of indices representing cards already used in deck
+	- deck_lst: a list representing the current deck of cards
 	
 	Returns:
 	- cards: a list of cards representing new cards to be added to a hand
 	"""
-	cards = []
+	cards_to_deal = []
 	
-	while len(cards) < num_cards:
-		new_card_index = randint(0,51)
-		
-		if not new_card_index in used_cards:
-			used_cards.append(new_card_index)
-			cards.append(deck[new_card_index])
+	while len(cards_to_deal) < num_cards:
+		cards_to_deal.append(deck_lst.pop())
 	
-	return cards
+	return cards_to_deal
 	
 	
 def print_board(show_dealer_hand, hand_num="All", hidden_card="No"):
@@ -418,29 +425,26 @@ def check_busted(name, hand_num=0):
 	
 	return busted
 		
-def hit(name, used_cards, hand_num=0):
+def hit(name, deck_lst, hand_num=0):
 	"""
 	Adds one card from the deck into a player's hand.
 	Arguments:
 	- name: a string representing player
-	- used_cards: a list of indices representing cards already used in deck
 	- hand: a list of cards representing the hand to add a card to
 	Notes:
 	- deal_cards() returns a list of one card - [0] is added to append the card itself to the hand
 	"""
 	
-	players[name]['hand'][hand_num].append(deal_cards(1,used_cards)[0])
+	players[name]['hand'][hand_num].append(deal_cards(1, deck_lst)[0])
 
-def deck_needs_shuffling(num_cards_used):
+def deck_needs_shuffling(deck):
 	"""
 	Checks whether the deck needs to be shuffled based on current rule in rules['shuffle'].
-	Arguments:
-	- num_cards_used: an int representing the number of cards already used
 	Returns:
 	- True if the deck needs to be shuffled.  False otherwise.
 	"""
 	
-	return num_cards_used > rules['shuffle']
+	return len(deck) < rules['shuffle']
 	
 def print_options(name, hand_num=0):
 	"""
@@ -575,7 +579,7 @@ def process_hit(name, hand_num=0):
 	Player has requested to hit.
 	"""
 	print "\n{} hits.".format(name.title())
-	hit(name, used_cards_indices, hand_num)
+	hit(name, deck, hand_num)
 	
 	if get_player_status(name, hand_num) == "doubling":
 		print_board(True, hand_num, len(get_hand(name, hand_num))-1)
@@ -596,7 +600,7 @@ def dealer_play():
 	
 	while get_player_status('dealer') == 'playing':
 		if dealer_must_hit():
-			hit('dealer', used_cards_indices)
+			hit('dealer', deck)
 		else:
 			change_player_status('dealer', 'done')
 	
@@ -655,8 +659,8 @@ def play_blackjack():
 		change_total_money('player', 100)
 		
 	#check if deck needs shuffling
-	if deck_needs_shuffling(len(used_cards_indices)):
-		shuffle_deck(used_cards_indices)
+	if deck_needs_shuffling(deck):
+		shuffle_deck(deck)
 	
 	#betting loop: ask for bet/check validity/set bet		
 	while True:
@@ -672,7 +676,7 @@ def play_blackjack():
 	
 	#deal cards to all people in game
 	for person in players:
-		players[person]['hand'][0] = deal_cards(2,used_cards_indices)
+		players[person]['hand'][0] = deal_cards(2, deck)
 				
 	#check if anyone has 21
 	check_anyone_has_21()

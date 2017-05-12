@@ -7,7 +7,6 @@ In Progress
 
 
 Backlog
-- change shuffle mechanic to use shuffle() OR optimize used_cards_indices: make into a list of 1/0 to indicate whether a card has been used or not (each index corresponds to the index of the card, so used_cards[num] = 1)
 - multiple players 
 ---> think about how board prints...show as player's turns happen?
 ---> need to convert players into list since order will matter
@@ -35,7 +34,7 @@ Completed Tasks
 + change check_winner() to handle checking split hands
 + create get_hand() to get all hands of a player or specific hand if num is provided.
 + hide card dealt from doubling down (currently doesn't print updated board with the hit showing... should print after bet is made)
-
++ change shuffle mechanic to use shuffle() OR optimize used_cards_indices: make into a list of 1/0 to indicate whether a card has been used or not (each index corresponds to the index of the card, so used_cards[num] = 1)
 
 Completed Bugs
 [+] 1. Double after split: Hand 2 printed after hand 1, but before hand 2 turn.  [DAS-bugs.txt, line 92]

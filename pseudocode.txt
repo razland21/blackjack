@@ -37,7 +37,7 @@ Completed Tasks
 + hide card dealt from doubling down (currently doesn't print updated board with the hit showing... should print after bet is made)
 + change shuffle mechanic to use shuffle() OR optimize used_cards_indices: make into a list of 1/0 to indicate whether a card has been used or not (each index corresponds to the index of the card, so used_cards[num] = 1)
 + bust after split, no notification that the hand busted, therefore turn over.
-
++ view rules
 
 Completed Bugs
 [+] 1. Double after split: Hand 2 printed after hand 1, but before hand 2 turn.  [DAS-bugs.txt, line 92]

@@ -16,9 +16,31 @@ players = {'dealer': {'hand': [[]], 'money': 0, 'bet': [0], 'status': ['playing'
 #win/blackjack/loss: multipliers
 #doubling_allowed: list of cards where doubling down is allowed
 #shuffle: min number of cards left in deck to be able to do another round (i.e. if current deck is less than this, then shuffle)
-#num_decks: number of decks to be used in-game (currently changes nothing)
+#num_decks: number of decks to be used in game (currently changes nothing)
 
 rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed': [10, 11], 'shuffle': 15, 'num_decks': 1}
+
+#SETTINGS
+
+def view_rules():
+	"""
+	Prints out rules currently set for game.
+	"""
+	double = ""
+	
+	#prepare string for doubling rule
+	for num in rules['doubling_allowed']:
+		if rules['doubling_allowed'].index(num) == 0:
+			double += str(num)
+		else:
+			double += ", " + str(num)
+			
+	print "\n***GAME RULES***\n"
+	print "Goal: Get as close to 21 as you can without going over. If you get closer to 21 than the dealer does, you win.\n"
+	print "- Minimum bet: ${}".format(rules['min_bet'])
+	print "- Doubling allowed on the following totals (first two cards only): {}".format(double)
+	print "- Number of decks used in game: {}".format(rules['num_decks'])
+	print "\n"
 
 #SPLITTING
 
@@ -805,7 +827,8 @@ def print_main_menu():
 	"""
 	print "Select from one of the following options:"
 	print "    1: Play Blackjack"
-	print "    2: Quit"
+	print "    2: View Rules"
+	print "    3: Quit"
 	print ""
 
 
@@ -823,6 +846,8 @@ def start_game():
 			print "Alright, let's play!\n"
 			play_blackjack()
 		elif choice == "2":
+			view_rules()
+		elif choice == "3":
 			print "Thanks for playing!"
 			break 
 		else:

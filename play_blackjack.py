@@ -606,7 +606,9 @@ def player_play(name, hand_num=0):
 	"""
 	Processes gameplay loop for a single player.
 	"""
-	
+	if check_21(name, hand_num=0):
+		change_player_status(name,'done',hand_num)
+		
 	while get_player_status(name, hand_num) == 'playing':
 		print_board(False, hand_num)
 		print "{}'s Turn - Hand {}\n".format(name.title(), hand_num+1)
@@ -618,17 +620,17 @@ def player_play(name, hand_num=0):
 			continue
 	
 		if move == "1":
-			process_hit('player', hand_num)
+			process_hit(name, hand_num)
 			
 		elif move == "2":
 			print "\nPlayer stands. Turn is over."
-			change_player_status('player','done', hand_num) 
+			change_player_status(name,'done', hand_num) 
 		
 		elif move == "3":
-			process_double('player', hand_num)
+			process_double(name, hand_num)
 		
 		elif move == "4":
-			process_split('player', hand_num)
+			process_split(name, hand_num)
 	
 
 
@@ -677,13 +679,14 @@ def play_blackjack():
 		
 	#*** PLAYER GAME LOOP START ***
 	
-	#check if any player statuses are 'playing'
+	#check if any player statuses are 'playing', if so, play that hand
 	while 'playing' in players['player']['status']:
 		player_play('player', players['player']['status'].index('playing'))
 			
-	#*** DEALER GAME LOOP START ***		
-	#player status = done: player has finished turn but no conclusion on win/loss
+			
+	#*** DEALER GAME LOOP START ***	
 	
+	#player status = done: player has finished turn but no conclusion on win/loss
 	for status in players['player']['status']:
 		if status == 'done':
 			dealer_play()

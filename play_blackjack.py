@@ -708,7 +708,7 @@ def player_play(name, hand_num=0):
 	"""
 	
 	if check_21(name, hand_num=0):
-		change_player_status(name,'done',hand_num)
+		change_player_status(name, 'done', hand_num)
 		
 	while get_player_status(name, hand_num) == 'playing':
 		print_board(False, hand_num)
@@ -836,6 +836,7 @@ start_game()
 
 def set_hand(name, card_list, hand_num=0):
 	players[name]['hand'][hand_num] = card_list
+
 
 #####################################################################
 # Doctest code

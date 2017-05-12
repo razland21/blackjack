@@ -100,6 +100,7 @@ def process_double(name, hand_num=0):
 	else:
 		change_player_status(name, 'done', hand_num) 
 	
+	print_board(False,hand_num,len(get_hand(name, hand_num))-1)
 	print "You have doubled on this hand. Turn is over."
 	
 

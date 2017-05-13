@@ -2,7 +2,7 @@ BUGS
 [-] 2. Double after split: I hit 21, so it told me that. I shouldn't announce it when doubling.  It should say card dealt [DAS-bugs.txt, line 102]
 [-] 5. if player splits hands, then gets 21 on a split, player is prompted to hit/stand.  should move forward.  [DAS-bugs.txt, dump 3]  If first two cards are dealt, and third one is dealt to get 21, it works fine.
 ---> add a check in player_play() for 21. 
-[] 8. Split - hit 21, didn't go to 2nd hand?  (not sure if this actually happened)
+[] 8. Split - hit 21, didn't go to 2nd hand. [21-after-split-bug.txt]
 
 In Progress
 
@@ -12,7 +12,6 @@ Backlog
 ---> think about how board prints...show as player's turns happen?
 ---> need to convert players into list since order will matter
 - insurance if dealer is showing A
-- change settings for rules
 - player(s) can input their own name
 - bets can be floats
 - how to handle both player and dealer having blackjack?  Currently draw.
@@ -39,6 +38,8 @@ Completed Tasks
 + bust after split, no notification that the hand busted, therefore turn over.
 + view rules
 + option to use multiple decks
++ change settings for rules
+
 
 Completed Bugs
 [+] 1. Double after split: Hand 2 printed after hand 1, but before hand 2 turn.  [DAS-bugs.txt, line 92]

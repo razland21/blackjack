@@ -22,26 +22,34 @@ rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed
 
 #RULES MANAGEMENT
 
+def print_double_str():
+	"""
+	Returns string representing the current values in doubling_allowed
+	"""
+	
+	double_str = ""
+	
+	#prepare string for doubling rule
+	if len(rules['doubling_allowed']) == 20:
+		double_str = "any two cards"
+	else:
+		double_str = ", ".join(str(num) for num in rules['doubling_allowed'][0:-1])
+		double_str += " and {}".format(rules['doubling_allowed'][-1])
+	
+	return double_str
+	
 def view_rules():
 	"""
 	Prints out rules currently set for game.
 	"""
-	double = ""
-	
-	#prepare string for doubling rule
-	for num in rules['doubling_allowed']:
-		if rules['doubling_allowed'].index(num) == 0:
-			double += str(num)
-		else:
-			double += ", " + str(num)
 			
 	print "\n***GAME RULES***\n"
 	print "Goal: Get as close to 21 as you can without going over. If you get closer to 21 than the dealer does, you win.\n"
 	print "- Minimum bet: ${}".format(rules['min_bet'])
-	print "- Doubling allowed on the following totals (first two cards only): {}".format(double)
+	print "- Doubling allowed on {}. Only one additional card is given to you if you double.".format(print_double_str())
 	print "- Number of decks used in game: {}".format(rules['num_decks'])
 	print "- Deck is shuffled when it has less than {} cards remaining.".format(rules['shuffle'])
-	print "\n"
+	print ""
 
 def process_rule_change(rule, new_value):
 	"""
@@ -57,14 +65,24 @@ def process_rule_change(rule, new_value):
 	
 	if rule not in rules.keys():
 		print "That rule is invalid. No changes will be made."
-	elif rule == "doubling_allowed":
-		pass
-	else:
-		if not new_value.isdigit():
+	elif not new_value.isdigit():
 			print "You must enter an integer greater than 0.\n"
-		else:
-			rules[rule] = int(new_value)
-			rule_changed = True
+	elif rule == "doubling_allowed":
+		if int(new_value) > 4:
+			print "You must enter one of the numbers above.\n"
+			return rule_changed
+		elif new_value == "1":
+			rules[rule] = range(8,12)
+		elif new_value == "2":
+			rules[rule] = range(9,12)
+		elif new_value == "3":
+			rules[rule] = range(9,12)
+		elif new_value == "4":
+			rules[rule] = range(2,22)
+		rule_changed = True
+	else:
+		rules[rule] = int(new_value)
+		rule_changed = True
 
 	return rule_changed
 	
@@ -77,10 +95,10 @@ def change_rules():
 	
 	while change:
 		print "\nYou can change the following rules:"
-		print "    1 - Minimum bet"
-		print "    2 - Number of decks used in game"
-		print "    3 - Shuffling threshold"
-		print "    4 - Doubling rules"
+		print "    1: Minimum bet"
+		print "    2: Doubling rules"
+		print "    3: Number of decks used in game"
+		print "    4: Shuffling threshold"
 		print "\nEnter number of rule to change or enter 'quit' to go back to the main menu."
 		
 		choice = raw_input(" > ").strip().lower()
@@ -89,12 +107,25 @@ def change_rules():
 			print "\nCurrent minimum bet: ${}".format(rules['min_bet'])
 			print "Enter a new minimum bet. It must be a positive integer."
 			
-			new_bet = raw_input(" > ").strip()
+			new_min_bet = raw_input(" > ").strip()
 			
-			if process_rule_change('min_bet', new_bet):
+			if process_rule_change('min_bet', new_min_bet):
 				print "\nThe minimum bet required is now ${}.".format(rules['min_bet'])
-				
+
 		elif choice == "2":
+			print "Doubling is currently allowed on {}.".format(print_double_str())
+			print "\nPick from one of the following rules:"
+			print "    1: Double on 8, 9, 10, 11 only"
+			print "    2: Double on 9, 10, 11 only"
+			print "    3: Double on 10, 11 only"
+			print "    4: Double on any two cards"
+			
+			new_doubling = raw_input(" > ").strip().lower()
+			
+			if process_rule_change('doubling_allowed', new_doubling):
+				print "\nYou can now double down on {}.".format(print_double_str())
+			
+		elif choice == "3":
 			print "\nCurrent number of decks used in game: {}".format(rules['num_decks'])
 			print "Enter the number of decks you want to use. It must be a positive integer."
 			
@@ -103,12 +134,15 @@ def change_rules():
 			if process_rule_change('num_decks', new_num_decks):
 				print "\nThe number of decks used in game is now {}.".format(rules['num_decks'])
 
-		elif choice == "3":
-			print "Option not yet available."
-			pass
 		elif choice == "4":
-			print "Option not yet available."
-			pass
+			print "\nGame currently shuffles deck when it has less than {} cards.".format(rules['shuffle'])
+			print "Enter a new shuffling threshold. It must be a positive integer."
+			
+			new_shuffle = raw_input(" > ").strip()
+			
+			if process_rule_change('shuffle', new_shuffle):
+				print "\nThe new shuffling threshold is now {}.".format(rules['shuffle'])
+
 		elif choice == "quit":
 			change = False
 		else:

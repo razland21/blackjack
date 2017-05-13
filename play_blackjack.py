@@ -40,10 +40,10 @@ def view_rules():
 	print "- Minimum bet: ${}".format(rules['min_bet'])
 	print "- Doubling allowed on the following totals (first two cards only): {}".format(double)
 	print "- Number of decks used in game: {}".format(rules['num_decks'])
-	print "- Deck is shuffled when it falls under {} cards remaining.".format(rules['shuffle'])
+	print "- Deck is shuffled when it has less than {} cards remaining.".format(rules['shuffle'])
 	print "\n"
 
-def process_rule_change(rule, new_value)
+def process_rule_change(rule, new_value):
 	"""
 	Changes the given rule to the given value.
 	Arguments:
@@ -57,13 +57,13 @@ def process_rule_change(rule, new_value)
 	
 	if rule not in rules.keys():
 		print "That rule is invalid. No changes will be made."
-	elif rule = "doubling_allowed":
+	elif rule == "doubling_allowed":
 		pass
 	else:
 		if not new_value.isdigit():
 			print "You must enter an integer greater than 0.\n"
 		else:
-			rules([rule]) = int(new_bet)
+			rules[rule] = int(new_value)
 			rule_changed = True
 
 	return rule_changed
@@ -77,26 +77,29 @@ def change_rules():
 	
 	while change:
 		print "\nYou can change the following rules:"
-		print "1 - Minimum bet"
-		print "2 - Number of decks used in game"
-		print "3 - Shuffling threshold"
-		print "4 - Doubling rules"
-		print "Enter number of rule to change or enter 'quit' to go back to the main menu."
+		print "    1 - Minimum bet"
+		print "    2 - Number of decks used in game"
+		print "    3 - Shuffling threshold"
+		print "    4 - Doubling rules"
+		print "\nEnter number of rule to change or enter 'quit' to go back to the main menu."
 		
 		choice = raw_input("> ").strip().lower()
 		
 		if choice == "1":
-			print "Current minimum bet: ${}".format(rules(['min_bet'])
+			print "Current minimum bet: ${}".format(rules['min_bet'])
 			print "Enter a new minimum bet. It must be an integer."
 			
 			new_bet = raw_input("> ").strip()
 			
 			if process_rule_change('min_bet', new_bet):
-				print "The minimum bet required is now ${}.".format(rules(['min_bet'])
+				print "The minimum bet required is now ${}.".format(rules['min_bet'])
 				
 		elif choice == "2":
+			pass
 		elif choice == "3":
+			pass
 		elif choice == "4":
+			pass
 		elif choice == "quit":
 			change = False
 		else:

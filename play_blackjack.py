@@ -83,13 +83,13 @@ def change_rules():
 		print "    4 - Doubling rules"
 		print "\nEnter number of rule to change or enter 'quit' to go back to the main menu."
 		
-		choice = raw_input("> ").strip().lower()
+		choice = raw_input(" > ").strip().lower()
 		
 		if choice == "1":
 			print "\nCurrent minimum bet: ${}".format(rules['min_bet'])
 			print "Enter a new minimum bet. It must be a positive integer."
 			
-			new_bet = raw_input("> ").strip()
+			new_bet = raw_input(" > ").strip()
 			
 			if process_rule_change('min_bet', new_bet):
 				print "\nThe minimum bet required is now ${}.".format(rules['min_bet'])
@@ -98,14 +98,16 @@ def change_rules():
 			print "\nCurrent number of decks used in game: {}".format(rules['num_decks'])
 			print "Enter the number of decks you want to use. It must be a positive integer."
 			
-			new_num_decks = raw_input("> ").strip()
+			new_num_decks = raw_input(" > ").strip()
 			
 			if process_rule_change('num_decks', new_num_decks):
 				print "\nThe number of decks used in game is now {}.".format(rules['num_decks'])
 
 		elif choice == "3":
+			print "Option not yet available."
 			pass
 		elif choice == "4":
+			print "Option not yet available."
 			pass
 		elif choice == "quit":
 			change = False
@@ -900,10 +902,11 @@ def print_main_menu():
 	"""
 	Print main menu options
 	"""
-	print "Select from one of the following options:"
+	print "\nSelect from one of the following options:"
 	print "    1: Play Blackjack"
 	print "    2: View Rules"
-	print "    3: Quit"
+	print "    3: Change Rules"
+	print "    4: Quit"
 	print ""
 
 
@@ -911,7 +914,7 @@ def start_game():
 	"""
 	Main function to start program
 	"""
-	print "\nWELCOME TO BLACKJACK! \n"
+	print "\nWELCOME TO BLACKJACK!"
 	
 	while True:
 		print_main_menu()
@@ -923,6 +926,8 @@ def start_game():
 		elif choice == "2":
 			view_rules()
 		elif choice == "3":
+			change_rules()
+		elif choice == "4":
 			print "Thanks for playing!"
 			break 
 		else:

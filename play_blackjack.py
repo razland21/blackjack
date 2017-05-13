@@ -16,11 +16,11 @@ players = {'dealer': {'hand': [[]], 'money': 0, 'bet': [0], 'status': ['playing'
 #win/blackjack/loss: multipliers
 #doubling_allowed: list of cards where doubling down is allowed
 #shuffle: min number of cards left in deck to be able to do another round (i.e. if current deck is less than this, then shuffle)
-#num_decks: number of decks to be used in game (currently changes nothing)
+#num_decks: number of decks to be used in game
 
 rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed': [10, 11], 'shuffle': 15, 'num_decks': 1}
 
-#SETTINGS
+#RULES MANAGEMENT
 
 def view_rules():
 	"""
@@ -40,7 +40,68 @@ def view_rules():
 	print "- Minimum bet: ${}".format(rules['min_bet'])
 	print "- Doubling allowed on the following totals (first two cards only): {}".format(double)
 	print "- Number of decks used in game: {}".format(rules['num_decks'])
+	print "- Deck is shuffled when it falls under {} cards remaining.".format(rules['shuffle'])
 	print "\n"
+
+def process_rule_change(rule, new_value)
+	"""
+	Changes the given rule to the given value.
+	Arguments:
+	- rule: string representing the rule to change. This must correspond to a key in the rules dictionary.
+	- new_value: int or list representing new values
+	Returns:
+	- rule_changed: True if rule changed. False otherwise.
+	"""
+	
+	rule_changed = False
+	
+	if rule not in rules.keys():
+		print "That rule is invalid. No changes will be made."
+	elif rule = "doubling_allowed":
+		pass
+	else:
+		if not new_value.isdigit():
+			print "You must enter an integer greater than 0.\n"
+		else:
+			rules([rule]) = int(new_bet)
+			rule_changed = True
+
+	return rule_changed
+	
+def change_rules():
+	"""
+	Give player option to change rules currently set for game.
+	"""
+	
+	change = True
+	
+	while change:
+		print "\nYou can change the following rules:"
+		print "1 - Minimum bet"
+		print "2 - Number of decks used in game"
+		print "3 - Shuffling threshold"
+		print "4 - Doubling rules"
+		print "Enter number of rule to change or enter 'quit' to go back to the main menu."
+		
+		choice = raw_input("> ").strip().lower()
+		
+		if choice == "1":
+			print "Current minimum bet: ${}".format(rules(['min_bet'])
+			print "Enter a new minimum bet. It must be an integer."
+			
+			new_bet = raw_input("> ").strip()
+			
+			if process_rule_change('min_bet', new_bet):
+				print "The minimum bet required is now ${}.".format(rules(['min_bet'])
+				
+		elif choice == "2":
+		elif choice == "3":
+		elif choice == "4":
+		elif choice == "quit":
+			change = False
+		else:
+			print "Sorry, I don't know what you mean by {}".format(rule_to_change)
+
 
 #SPLITTING
 
@@ -249,12 +310,16 @@ def shuffle_deck(deck_lst):
 	#clear deck
 	del deck_lst[0:]
 	
-	#create new shuffled deck, currently assuming single deck
-	card_indices = range(52)
-	shuffle(card_indices)
+	decks_added = 0
 	
-	for index in card_indices:
-		deck_lst.append(deck_template[index])
+	while decks_added < rules['num_decks']:
+		card_indices = range(52)
+		shuffle(card_indices)
+		
+		for index in card_indices:
+			deck_lst.append(deck_template[index])
+		
+		decks_added += 1
 		
 	print "Cards have been shuffled.\n"
 	

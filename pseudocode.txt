@@ -11,12 +11,12 @@ Backlog
 - multiple players 
 ---> think about how board prints...show as player's turns happen?
 ---> need to convert players into list since order will matter
-- option to use multiple decks
 - insurance if dealer is showing A
 - change settings for rules
 - player(s) can input their own name
 - bets can be floats
 - how to handle both player and dealer having blackjack?  Currently draw.
+- splitting As: only get one card each (same behavior as doubling)
 
 --------------------------------
 
@@ -38,6 +38,7 @@ Completed Tasks
 + change shuffle mechanic to use shuffle() OR optimize used_cards_indices: make into a list of 1/0 to indicate whether a card has been used or not (each index corresponds to the index of the card, so used_cards[num] = 1)
 + bust after split, no notification that the hand busted, therefore turn over.
 + view rules
++ option to use multiple decks
 
 Completed Bugs
 [+] 1. Double after split: Hand 2 printed after hand 1, but before hand 2 turn.  [DAS-bugs.txt, line 92]

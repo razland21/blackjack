@@ -86,16 +86,23 @@ def change_rules():
 		choice = raw_input("> ").strip().lower()
 		
 		if choice == "1":
-			print "Current minimum bet: ${}".format(rules['min_bet'])
-			print "Enter a new minimum bet. It must be an integer."
+			print "\nCurrent minimum bet: ${}".format(rules['min_bet'])
+			print "Enter a new minimum bet. It must be a positive integer."
 			
 			new_bet = raw_input("> ").strip()
 			
 			if process_rule_change('min_bet', new_bet):
-				print "The minimum bet required is now ${}.".format(rules['min_bet'])
+				print "\nThe minimum bet required is now ${}.".format(rules['min_bet'])
 				
 		elif choice == "2":
-			pass
+			print "\nCurrent number of decks used in game: {}".format(rules['num_decks'])
+			print "Enter the number of decks you want to use. It must be a positive integer."
+			
+			new_num_decks = raw_input("> ").strip()
+			
+			if process_rule_change('num_decks', new_num_decks):
+				print "\nThe number of decks used in game is now {}.".format(rules['num_decks'])
+
 		elif choice == "3":
 			pass
 		elif choice == "4":
@@ -103,7 +110,7 @@ def change_rules():
 		elif choice == "quit":
 			change = False
 		else:
-			print "Sorry, I don't know what you mean by {}".format(rule_to_change)
+			print "Sorry, I don't know what you mean by {}.".format(choice)
 
 
 #SPLITTING

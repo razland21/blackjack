@@ -1,8 +1,5 @@
 BUGS
 [-] 2. Double after split: I hit 21, so it told me that. I shouldn't announce it when doubling.  It should say card dealt [DAS-bugs.txt, line 102]
-[-] 5. if player splits hands, then gets 21 on a split, player is prompted to hit/stand.  should move forward.  [DAS-bugs.txt, dump 3]  If first two cards are dealt, and third one is dealt to get 21, it works fine.
----> add a check in player_play() for 21. 
-[] 8. Split - hit 21, didn't go to 2nd hand. [21-after-split-bug.txt]
 
 In Progress
 
@@ -47,6 +44,9 @@ Completed Bugs
 [+] 4. Calculate_change() needs to take into account which bet to change with!
 [+] 7. Full board is printing twice. [DAS-bugs.txt, dump 4]
 [+] 6. Split then bust, board doesn't print to show busted card.  [DAS-bugs.txt, dump 4]
+[+] 5. if player splits hands, then gets 21 on a split, player is prompted to hit/stand.  should move forward.  [DAS-bugs.txt, dump 3]  If first two cards are dealt, and third one is dealt to get 21, it works fine.
+---> add a check in player_play() for 21. 
+[+] 8. Split - hit 21, didn't go to 2nd hand. [21-after-split-bug.txt]
 
 
 MVP

@@ -189,6 +189,7 @@ def split_hands(name, hand_num=0):
 	
 	# Add new status to status list.
 	players[name]['status'].append('playing')
+
 	
 
 def process_split(name, hand_num=0):
@@ -839,32 +840,36 @@ def player_play(name, hand_num=0):
 	- name: a string representing the player
 	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	"""
-	
-	if check_21(name, hand_num=0):
-		change_player_status(name, 'done', hand_num)
+
 		
 	while get_player_status(name, hand_num) == 'playing':
+	
 		print_board(False, hand_num)
 		print "{}'s Turn - Hand {}\n".format(name.title(), hand_num+1)
-		print_options(name, hand_num)
-		move = raw_input("Enter the number for the move you want to make: ").strip()
 		
-		#if move is not valid, start loop over
-		if not check_valid_move(move):
-			continue
-	
-		if move == "1":
-			process_hit(name, hand_num)
+		if check_21(name, hand_num):
+			change_player_status(name, 'done', hand_num)
+		
+		else:
+			print_options(name, hand_num)
+			move = raw_input("Enter the number for the move you want to make: ").strip()
 			
-		elif move == "2":
-			print "\nPlayer stands. Turn is over."
-			change_player_status(name,'done', hand_num) 
+			#if move is not valid, start loop over
+			if not check_valid_move(move):
+				continue
 		
-		elif move == "3":
-			process_double(name, hand_num)
-		
-		elif move == "4":
-			process_split(name, hand_num)
+			if move == "1":
+				process_hit(name, hand_num)
+				
+			elif move == "2":
+				print "\nPlayer stands. Turn is over."
+				change_player_status(name,'done', hand_num) 
+			
+			elif move == "3":
+				process_double(name, hand_num)
+			
+			elif move == "4":
+				process_split(name, hand_num)
 	
 
 

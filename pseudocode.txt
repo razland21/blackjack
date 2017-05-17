@@ -1,7 +1,7 @@
 BUGS
 
 In Progress
-
+- check what happens with floats on min bet changes.
 
 Backlog
 - multiple players 

@@ -131,7 +131,7 @@ def change_rules():
 		
 		if choice == "1":
 			print "\nCurrent minimum bet: ${}".format(rules['min_bet'])
-			print "Enter a new minimum bet. It must be a positive integer."
+			print "Enter a new minimum bet. It must be a positive number."
 			
 			new_min_bet = raw_input(" > ").strip()
 			
@@ -284,16 +284,14 @@ def check_valid_bet(bet):
 	- move: string representing a bet
 	Returns:
 	- True if bet is valid. False otherwise.
-	Assumptions:
-	- bets must be integers greater than 1
 	"""
 	try:
 		float(bet)
 	except:
-		print "You must enter a number greater than 0\n"
+		print "You must enter a number greater than 0.\n"
 		return False
 	if float(bet) < rules['min_bet']:
-		print "You must bet at least ${}.\n".format(rules['min_bet'])
+		print "You must bet at least ${:.2f}.\n".format(rules['min_bet'])
 		return False
 	else:
 		return True
@@ -334,7 +332,7 @@ def set_bet(player_posn, bet, bet_num=0):
 	"""
 	
 	players[player_posn]['bet'][bet_num] = bet
-	print "{} has bet ${} in this round for Hand {}.".format(get_name(player_posn),bet,bet_num+1)
+	print "{} has bet ${:.2f} in this round for Hand {}.".format(get_name(player_posn),bet,bet_num+1)
 	
 	
 def change_total_money(player_posn, amount):
@@ -345,9 +343,9 @@ def change_total_money(player_posn, amount):
 	- amount: a float representing the amount that the player's total should change by
 	"""
 	
-	print "\n{}'s previous total money: ${}".format(get_name(player_posn), players[player_posn]['money'])
+	print "\n{}'s previous total money: ${:.2f}".format(get_name(player_posn), players[player_posn]['money'])
 	players[player_posn]['money'] += ceil(float(amount)*100)/100
-	print "{}'s current total money: ${}\n".format(get_name(player_posn), players[player_posn]['money'])
+	print "{}'s current total money: ${:.2f}\n".format(get_name(player_posn), players[player_posn]['money'])
 
 	
 def calculate_change(player_posn, rule, bet_num=0):
@@ -921,7 +919,7 @@ def play_blackjack():
 		set_name(1, player_name)
 	
 	print "Minimum bet is ${}.".format(rules['min_bet'])
-	print "{}'s total money: ${}\n".format(get_name(1),players[1]['money'])
+	print "{}'s total money: ${:.2f}\n".format(get_name(1),players[1]['money'])
 	
 	#reset board
 	reset_board()
@@ -945,7 +943,7 @@ def play_blackjack():
 				set_bet(1, verified_bet)
 				break
 			else:
-				print "You do not have enough money to make that bet. Your current total is ${}.\n".format(players[1]['money'])
+				print "You do not have enough money to make that bet. Your current total is ${:.2f}.\n".format(players[1]['money'])
 	
 	#deal cards to all people in game
 	for index in range(len(players)):

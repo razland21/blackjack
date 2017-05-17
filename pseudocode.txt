@@ -1,10 +1,10 @@
 BUGS
-[-] 2. Double after split: I hit 21, so it told me that. I shouldn't announce it when doubling.  It should say card dealt [DAS-bugs.txt, line 102]
 
 In Progress
 
 
 Backlog
+- error handling: trying to hit when there's no more cards in the deck
 - multiple players 
 ---> think about how board prints...show as player's turns happen?
 ---> need to convert players into list since order will matter
@@ -47,6 +47,7 @@ Completed Bugs
 [+] 5. if player splits hands, then gets 21 on a split, player is prompted to hit/stand.  should move forward.  [DAS-bugs.txt, dump 3]  If first two cards are dealt, and third one is dealt to get 21, it works fine.
 ---> add a check in player_play() for 21. 
 [+] 8. Split - hit 21, didn't go to 2nd hand. [21-after-split-bug.txt]
+[+] 2. Double after split: I hit 21, so it told me that. I shouldn't announce it when doubling.  It should say card dealt [DAS-bugs.txt, line 102]
 
 
 MVP

@@ -4,7 +4,6 @@ In Progress
 
 
 Backlog
-- error handling: trying to hit when there's no more cards in the deck
 - multiple players 
 ---> think about how board prints...show as player's turns happen?
 ---> need to convert players into list since order will matter
@@ -36,6 +35,7 @@ Completed Tasks
 + view rules
 + option to use multiple decks
 + change settings for rules
++ error handling: trying to hit when there's no more cards in the deck
 
 
 Completed Bugs

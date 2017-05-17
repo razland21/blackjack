@@ -397,6 +397,9 @@ def deal_cards(num_cards, deck_lst):
 	"""
 	dealt_cards = []
 	
+	if len(deck_lst) < num_cards:
+		shuffle_deck(deck_lst)
+		
 	while len(dealt_cards) < num_cards:
 		dealt_cards.append(deck_lst.pop())
 	
@@ -640,6 +643,7 @@ def hit(player_posn, deck_lst, hand_num=0):
 	"""
 	
 	#Note: deal_cards() returns a list of one card - [0] is added to append the card itself to the hand
+	
 	players[player_posn]['hand'][hand_num].append(deal_cards(1, deck_lst)[0])
 
 	

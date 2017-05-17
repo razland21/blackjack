@@ -1,5 +1,4 @@
 BUGS
-[-] 9. 21 after split, doesn't say that the hand hit 21.
 
 In Progress
 
@@ -7,10 +6,7 @@ In Progress
 Backlog
 - multiple players 
 ---> think about how board prints...show as player's turns happen?
----> need to convert players into list since order will matter
 - insurance if dealer is showing A
-- player(s) can input their own name
-- bets can be floats
 - how to handle both player and dealer having blackjack?  Currently draw.
 - splitting As: only get one card each (same behavior as doubling)
 
@@ -37,6 +33,9 @@ Completed Tasks
 + option to use multiple decks
 + change settings for rules
 + error handling: trying to hit when there's no more cards in the deck
++ need to convert players into list since order will matter
++ player(s) can input their own name
++ bets can be floats
 
 
 Completed Bugs
@@ -49,6 +48,7 @@ Completed Bugs
 ---> add a check in player_play() for 21. 
 [+] 8. Split - hit 21, didn't go to 2nd hand. [21-after-split-bug.txt]
 [+] 2. Double after split: I hit 21, so it told me that. I shouldn't announce it when doubling.  It should say card dealt [DAS-bugs.txt, line 102]
+[+] 9. 21 after split, doesn't say that the hand hit 21.
 
 
 MVP

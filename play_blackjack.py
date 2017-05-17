@@ -1,4 +1,5 @@
 from random import shuffle
+from math import ceil
 
 deck_template = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'),(10,'H'),('J','H'),('Q','H'),('K','H'),
 ('A','D'),(2,'D'),(3,'D'),(4,'D'),(5,'D'),(6,'D'),(7,'D'),(8,'D'),(9,'D'),(10,'D'),('J','D'),('Q','D'),('K','D'),
@@ -272,7 +273,6 @@ def process_double(player_posn, hand_num=0):
 	else:
 		change_player_status(player_posn, 'done', hand_num) 
 	
-	
 
 
 #BETTING
@@ -287,11 +287,12 @@ def check_valid_bet(bet):
 	Assumptions:
 	- bets must be integers greater than 1
 	"""
-
-	if not bet.isdigit():
-		print "You must enter an integer greater than 0.\n"
+	try:
+		float(bet)
+	except:
+		print "You must enter a number greater than 0\n"
 		return False
-	elif int(bet) < rules['min_bet']:
+	if float(bet) < rules['min_bet']:
 		print "You must bet at least ${}.\n".format(rules['min_bet'])
 		return False
 	else:
@@ -345,7 +346,7 @@ def change_total_money(player_posn, amount):
 	"""
 	
 	print "\n{}'s previous total money: ${}".format(get_name(player_posn), players[player_posn]['money'])
-	players[player_posn]['money'] += amount
+	players[player_posn]['money'] += ceil(float(amount)*100)/100
 	print "{}'s current total money: ${}\n".format(get_name(player_posn), players[player_posn]['money'])
 
 	
@@ -367,7 +368,7 @@ def calculate_change(player_posn, rule, bet_num=0):
 	else:
 		print "{} is an invalid rule. No change will be made to {}'s total".format(rule, get_name(player_posn))
 	
-	return total
+	return ceil(float(total)*100)/100
 
 
 #MAIN SUPPORTING FUNCTIONS
@@ -939,9 +940,9 @@ def play_blackjack():
 		bet = raw_input("Enter the amount you want to bet: ").strip()
 
 		if check_valid_bet(bet):
-			bet = int(bet)
-			if check_funding(1, bet):
-				set_bet(1, bet)
+			verified_bet = ceil(float(bet)*100)/100
+			if check_funding(1, verified_bet):
+				set_bet(1, verified_bet)
 				break
 			else:
 				print "You do not have enough money to make that bet. Your current total is ${}.\n".format(players[1]['money'])

@@ -1,7 +1,6 @@
 BUGS
 
 In Progress
-- check what happens with floats on min bet changes.
 
 Backlog
 - multiple players 
@@ -9,6 +8,7 @@ Backlog
 - insurance if dealer is showing A
 - how to handle both player and dealer having blackjack?  Currently draw.
 - splitting As: only get one card each (same behavior as doubling)
+- some edge cases around decimals
 
 --------------------------------
 

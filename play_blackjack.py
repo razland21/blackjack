@@ -10,7 +10,7 @@ deck = []
 
 #main game data tracking
 players = [{'name':'dealer', 'hand': [[]], 'money': 0, 'bet': [0], 'status': ['playing']}, 
-	{'name':'player', 'hand': [[]], 'money': 100, 'bet': [0], 'status': ['playing']}]
+	{'name':"", 'hand': [[]], 'money': 100, 'bet': [0], 'status': ['playing']}]
 
 #rules
 #min_bet: int value
@@ -131,7 +131,7 @@ def change_rules():
 		
 		if choice == "1":
 			print "\nCurrent minimum bet: ${}".format(rules['min_bet'])
-			print "Enter a new minimum bet. It must be a positive number."
+			print "Enter a new minimum bet. It must be a positive integer."
 			
 			new_min_bet = raw_input(" > ").strip()
 			
@@ -914,7 +914,7 @@ def play_blackjack():
 	
 	#check if player's name is set - if not, ask for name
 	
-	if get_name(1) == 'Player':
+	if get_name(1) == "":
 		player_name = raw_input("What is your name? ").strip().lower()
 		set_name(1, player_name)
 	

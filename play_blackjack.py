@@ -22,6 +22,16 @@ rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed
 
 
 #PLAYER NAME
+
+def set_name(player_posn, name):
+	"""
+	Sets name of given player.
+	Arguments:
+	- player_posn: an int representing the player
+	- name: a string representing the player's name
+	"""
+	players[player_posn]['name'] = name
+	
 	
 def get_name(player_posn):
 	"""
@@ -441,7 +451,7 @@ def print_player_board(player_posn, hand_num=0, hidden_card="No"):
 	- hidden_card: an int representing the position of a card that should be hidden or a string representing all cards to be shown. Default is "No" (full list of cards).
 	"""
 	
-	print "\n\n***PLAYER - HAND {}***".format(hand_num+1)
+	print "\n\n***PLAYER {} - {} - HAND {}***".format(1,get_name(1).upper(),hand_num+1)
 	print_hand(player_posn, hand_num, hidden_card)
 
 	if get_player_status(player_posn, hand_num) != "doubling":
@@ -741,7 +751,7 @@ def check_winner():
 	print "----------------------\n"
 	
 	for hand_index in range(len(get_hand(1))):
-		print "PLAYER - HAND {}:".format(hand_index+1)
+		print "PLAYER {} - {} - HAND {}:".format(1, get_name(1).upper(), hand_index+1)
 		
 		if check_busted(1, hand_index):
 			print "Busted! You lose."
@@ -869,6 +879,7 @@ def player_play(player_posn, hand_num=0):
 		
 		if check_21(player_posn, hand_num):
 			change_player_status(player_posn, 'done', hand_num)
+			print "Total is 21. {}'s turn is over.".format(get_name(player_posn))
 		
 		else:
 			print_options(player_posn, hand_num)
@@ -901,8 +912,15 @@ def play_blackjack():
 	"""
 	
 	#*** GAME START ***
+	
+	#check if player's name is set - if not, ask for name
+	
+	if get_name(1) == 'Player':
+		player_name = raw_input("What is your name? ").strip().lower()
+		set_name(1, player_name)
+	
 	print "Minimum bet is ${}.".format(rules['min_bet'])
-	print "Player's total money: ${}\n".format(players[1]['money'])
+	print "{}'s total money: ${}\n".format(get_name(1),players[1]['money'])
 	
 	#reset board
 	reset_board()

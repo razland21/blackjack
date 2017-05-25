@@ -9,8 +9,10 @@ deck_template = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H
 deck = []
 
 #main game data tracking
-players = [{'name':'dealer', 'hand': [[]], 'money': 0, 'bet': [0], 'status': ['playing']}, 
-	{'name':"", 'hand': [[]], 'money': 100, 'bet': [0], 'status': ['playing']}]
+players = [{'name':'dealer', 'hand': [[]], 'money': 0, 'bet': [0], 'status': ['playing']}]
+
+initial_start = True
+
 
 #rules
 #min_bet: int value
@@ -21,6 +23,20 @@ players = [{'name':'dealer', 'hand': [[]], 'money': 0, 'bet': [0], 'status': ['p
 
 rules = {'min_bet': 1, 'win': 1, 'blackjack': 1.5, 'loss': -1, 'doubling_allowed': [10, 11], 'shuffle': 15, 'num_decks': 1}
 
+
+#MULTIPLAYER
+
+def add_player():
+	players.append({'name':"", 'hand': [[]], 'money': 100, 'bet': [0], 'status': ['playing']})
+
+def need_dealer_play():
+	for i in range(1,len(players)):
+		if 'done' in players[i]['status']:
+			return True
+	
+	return False
+
+	
 
 #PLAYER NAME
 
@@ -265,7 +281,7 @@ def process_double(player_posn, hand_num=0):
 	change_player_status(player_posn, 'doubling', hand_num)
 	hit(player_posn, deck, hand_num)
 	
-	print_board(False, hand_num,len(get_hand(player_posn, hand_num))-1)
+	print_board(False, player_posn,hand_num,len(get_hand(player_posn, hand_num))-1)
 	print "\nHand is doubled. {}'s turn is over.".format(get_name(player_posn))
 
 	if check_busted(player_posn, hand_num):
@@ -332,7 +348,7 @@ def set_bet(player_posn, bet, bet_num=0):
 	"""
 	
 	players[player_posn]['bet'][bet_num] = bet
-	print "{} has bet ${:.2f} in this round for Hand {}.".format(get_name(player_posn),bet,bet_num+1)
+	print "{} has bet ${:.2f} in this round for Hand {}.\n".format(get_name(player_posn),bet,bet_num+1)
 	
 	
 def change_total_money(player_posn, amount):
@@ -415,7 +431,7 @@ def deal_cards(num_cards, deck_lst):
 	return dealt_cards
 
 	
-def print_board(show_dealer_hand, hand_num="All", hidden_card="No"):
+def print_board(show_dealer_hand, player_posn="All", hand_num="All", hidden_card="No"):
 	"""
 	Prints current game board.
 	Arguments:
@@ -430,16 +446,23 @@ def print_board(show_dealer_hand, hand_num="All", hidden_card="No"):
 
 	else:
 		print_hand(0, 0, 0)
+	
+	#print player portion of board
+	if type(player_posn) == int:
+		if type(hand_num) == int:
+			print_player_board(player_posn, hand_num, hidden_card)
+		
+		else:  #print all hands for given player, assumes no need to hide any cards
+			print_all_hands(player_posn)
+				
+	else:  #print all players, assumes no need to hide any cards
+		for player in range(1,len(players)):
+			print_all_hands(player)
 
-	#only works for single player...probably need to pass in player as argument
-	
-	if type(hand_num) == int:
-		print_player_board(1, hand_num, hidden_card)
-	
-	else:  #print all hands for player, assumes no need to hide any cards
-		for num in range(len(get_hand(1))):
-			print_player_board(1, num)
-			
+def print_all_hands(player_posn):
+	for num in range(len(get_hand(player_posn))):
+		print_player_board(player_posn, num)
+
 			
 def print_player_board(player_posn, hand_num=0, hidden_card="No"):
 	"""
@@ -450,7 +473,7 @@ def print_player_board(player_posn, hand_num=0, hidden_card="No"):
 	- hidden_card: an int representing the position of a card that should be hidden or a string representing all cards to be shown. Default is "No" (full list of cards).
 	"""
 	
-	print "\n\n***PLAYER {} - {} - HAND {}***".format(1,get_name(1).upper(),hand_num+1)
+	print "\n\n***PLAYER {} - {} - HAND {}***".format(player_posn, get_name(player_posn).upper(), hand_num+1)
 	print_hand(player_posn, hand_num, hidden_card)
 
 	if get_player_status(player_posn, hand_num) != "doubling":
@@ -596,23 +619,31 @@ def check_anyone_has_21():
 	This check only happens at the beginning of each game - assumes looking at first hand only of each player.
 	Returns:
 	- True if anyone has 21. False otherwise.
-	Note:
-	- Currently only works for single player.
 	"""
-	dealer_has_21 = check_21(0)
-	player_has_21 = check_21(1)
+	who_has_21 = []
 	
-	if dealer_has_21 or player_has_21:	
-		if dealer_has_21 and player_has_21:
-			print "Both of you have 21.  Draw."
-			change_player_status(1,'draw')
-		elif dealer_has_21:
-			change_player_status(1,'loss')
-		elif player_has_21:
-			change_player_status(1,'win')
-		return True
-	else:
+	for i in range(len(players)):
+		who_has_21.append(check_21(i))
+
+	#no one has 21
+	if not any(who_has_21):
 		return False
+	
+	#check dealer
+	if who_has_21[0]:
+		for i in range(1,len(who_has_21)):
+			change_player_status(i,'loss')
+	
+	#check each player to adjust for push/blackjack
+	for i in range(1,len(who_has_21)):
+		if who_has_21[i]:
+			if who_has_21[0]:
+				print "{}, both of you have 21. Push.".format(get_name(i))
+				change_player_status(i,'push')
+			else:
+				change_player_status(i,'win')
+	
+	return True
 
 def has_ace(player_posn, hand_num=0):
 	"""
@@ -742,46 +773,47 @@ def check_dealer_won(player_posn, hand_num):
 	
 def check_winner():
 	"""
-	Checks who won the game. Currently only works for single player.
-	Note: 0 = dealer. 1 = player.
+	Checks who won the game. 
+	Note: 0 = dealer. 1+ = players.
 	"""
 	print "----------------------"
 	print " *** GAME RESULTS ***"
 	print "----------------------\n"
 	
-	for hand_index in range(len(get_hand(1))):
-		print "PLAYER {} - {} - HAND {}:".format(1, get_name(1).upper(), hand_index+1)
-		
-		if check_busted(1, hand_index):
-			print "Busted! You lose."
-			change_total_money(1, calculate_change(1,'loss', hand_index))
-		
-		elif get_player_status(1, hand_index) == 'loss':
-			if check_21(0):
-				print "Sorry, dealer has 21.  You lose."
-			else: 
-				print "You lose."
-			change_total_money(1, calculate_change(1,'loss', hand_index))
-
-		elif check_dealer_won(1, hand_index):
-			print "Sorry, dealer won."
-			change_total_money(1, calculate_change(1, 'loss', hand_index))
-
-		elif sum_cards(1, hand_index) == sum_cards(0):
-			print "Push.\n"
-
-		elif check_blackjack(1):
-			print "Player has Blackjack! You win!"
-			change_total_money(1, calculate_change(1,'blackjack', hand_index))
+	for i in range(1,len(players)):
+		for hand_index in range(len(get_hand(i))):
+			print "PLAYER {} - {} - HAND {}:".format(i, get_name(i).upper(), hand_index+1)
 			
-		else:
-			if check_busted(0):				
-				print "Dealer busted! Player wins!"
+			if check_busted(i, hand_index):
+				print "Busted! You lose."
+				change_total_money(i, calculate_change(i,'loss', hand_index))
+			
+			elif get_player_status(i, hand_index) == 'loss':
+				if check_21(0):
+					print "Sorry, dealer has 21.  You lose."
+				else: 
+					print "You lose."
+				change_total_money(i, calculate_change(i,'loss', hand_index))
+
+			elif check_dealer_won(i, hand_index):
+				print "Sorry, dealer won."
+				change_total_money(i, calculate_change(i, 'loss', hand_index))
+
+			elif sum_cards(i, hand_index) == sum_cards(0):
+				print "Push.\n"
+
+			elif check_blackjack(i):
+				print "Player has Blackjack! You win!"
+				change_total_money(i, calculate_change(i,'blackjack', hand_index))
 				
-			elif sum_cards(1, hand_index) > sum_cards(0):
-				print "Congratulations, player wins!"
-				
-			change_total_money(1, calculate_change(1, 'win', hand_index))
+			else:
+				if check_busted(0):				
+					print "Dealer busted! You win!"
+					
+				elif sum_cards(i, hand_index) > sum_cards(0):
+					print "Congratulations, you win!"
+					
+				change_total_money(i, calculate_change(i, 'win', hand_index))
 
 			
 def change_player_status(player_posn, status, hand_num=0):
@@ -833,16 +865,16 @@ def process_hit(player_posn, hand_num=0):
 	
 	#if hitting due to a doubling move, do not show last card until game is over.
 	if get_player_status(player_posn, hand_num) == "doubling":
-		print_board(False, hand_num, len(get_hand(player_posn, hand_num))-1)
+		print_board(False, player_posn, hand_num, len(get_hand(player_posn, hand_num))-1)
 		print "Card dealt. {}'s turn is over.".format(get_name(player_posn))
 	
 	elif check_busted(player_posn, hand_num):
-		print_board(False, hand_num) 
+		print_board(False, player_posn, hand_num) 
 		print "Busted. {}'s turn is over.".format(get_name(player_posn))
 		change_player_status(player_posn, 'loss', hand_num)
 		
 	elif check_21(player_posn, hand_num):
-		print_board(False, hand_num)
+		print_board(False, player_posn, hand_num)
 		print "Total is 21. {}'s turn is over.".format(get_name(player_posn))
 		change_player_status(player_posn, 'done', hand_num)
 
@@ -873,7 +905,7 @@ def player_play(player_posn, hand_num=0):
 		
 	while get_player_status(player_posn, hand_num) == 'playing':
 	
-		print_board(False, hand_num)
+		print_board(False, player_posn, hand_num)
 		print "{}'s Turn - Hand {}\n".format(get_name(player_posn), hand_num+1)
 		
 		if check_21(player_posn, hand_num):
@@ -909,41 +941,66 @@ def play_blackjack():
 	"""
 	Main function to run blackjack game.
 	"""
+	global initial_start
 	
 	#*** GAME START ***
 	
-	#check if player's name is set - if not, ask for name
+	#check if initial game start - ask for # players
+	while initial_start:
+		num_players = raw_input("How many players? ").strip()
+		
+		try:
+			num_players = int(num_players)
+			
+			for i in range(num_players):
+				add_player()
+			initial_start = False
+			
+		except:
+			print "You must input a valid integer.\n"
+			
 	
-	if get_name(1) == "":
-		player_name = raw_input("What is your name? ").strip().lower()
-		set_name(1, player_name)
+	#check if player's name is set - if not, ask for name
+	for i in range(len(players)):
+		if get_name(i) == "":
+			print "Player {}, what is your name? ".format(i)
+			player_name = raw_input("> ").strip().lower()
+			set_name(i, player_name)
+			print ""
+	
 	
 	print "Minimum bet is ${}.".format(rules['min_bet'])
-	print "{}'s total money: ${:.2f}\n".format(get_name(1),players[1]['money'])
+	
+	for i in range(1, len(players)):
+		print "{}'s total money: ${:.2f}".format(get_name(i),players[i]['money'])
 	
 	#reset board
 	reset_board()
 	
 	#check if player has enough money, adds in $100 increments if not
-	while not check_funding(1, rules['min_bet']):
-		print "Oh no, you're broke! Let's fix that!"
-		change_total_money(1, 100)
+	for i in range(1, len(players)):
+		while not check_funding(i, rules['min_bet']):
+			print "Oh no, {}, you're broke! Let's fix that!".format(get_name(i))
+			change_total_money(i, 100)
 		
 	#check if deck needs shuffling
 	if deck_needs_shuffling(deck):
+		print ""
 		shuffle_deck(deck)
 	
-	#betting loop: ask for bet/check validity/set bet		
-	while True:
-		bet = raw_input("Enter the amount you want to bet: ").strip()
+	#betting loop: ask for bet/check validity/set bet
+	for i in range(1, len(players)):
+		while True:
+			print "{}, enter the amount you want to bet. ".format(get_name(i))
+			bet = raw_input("> ").strip()
 
-		if check_valid_bet(bet):
-			verified_bet = ceil(float(bet)*100)/100
-			if check_funding(1, verified_bet):
-				set_bet(1, verified_bet)
-				break
-			else:
-				print "You do not have enough money to make that bet. Your current total is ${:.2f}.\n".format(players[1]['money'])
+			if check_valid_bet(bet):
+				verified_bet = ceil(float(bet)*100)/100
+				if check_funding(i, verified_bet):
+					set_bet(i, verified_bet)
+					break
+				else:
+					print "{}, you do not have enough money to make that bet. Your current total is ${:.2f}.\n".format(get_name(i), players[i]['money'])
 	
 	#deal cards to all people in game
 	for index in range(len(players)):
@@ -956,17 +1013,16 @@ def play_blackjack():
 	#*** PLAYER GAME LOOP START ***
 	
 	#check if any player statuses are 'playing', if so, play that hand
-	while 'playing' in players[1]['status']:
-		player_play(1, players[1]['status'].index('playing'))
+	for i in range(1,len(players)):
+		while 'playing' in players[i]['status']:
+			player_play(i, players[i]['status'].index('playing'))
 			
 			
 	#*** DEALER GAME LOOP START ***	
 	
 	#player status = done: player has finished turn but no conclusion on win/loss
-	for status in players[1]['status']:
-		if status == 'done':
-			dealer_play()
-			break
+	if need_dealer_play():
+		dealer_play()
 	
 	print_board(True)
 	check_winner()				

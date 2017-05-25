@@ -1,12 +1,14 @@
 BUGS
 
 In Progress
-
-Backlog
 - multiple players 
 ---> think about how board prints...show as player's turns happen?
+
+Backlog
+- announce blackjack ahead of time before remaining players start?
+- time delay between printing boards and/or press enter to continue
+- able to change blackjack multiplier
 - insurance if dealer is showing A
-- how to handle both player and dealer having blackjack?  Currently draw.
 - splitting As: only get one card each (same behavior as doubling)
 - some edge cases around decimals
 
@@ -80,6 +82,17 @@ loss: -1
 doubling_allowed: [10, 11]
 shuffle: 15
 num_decks: 1
+
+----------------------------------------------------------------------------------------------
+***MULTIPLAYER PSEUDOCODE***
+
+Code Outline:
+
+if initial game start, ask how many players in the game
+add number of players
+add names for all players
+process each player individually
+
 
 ----------------------------------------------------------------------------------------------
 ***SPLITTING PSEUDOCODE***

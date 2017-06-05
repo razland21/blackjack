@@ -1,5 +1,6 @@
 from random import shuffle
 from math import ceil
+from time import sleep
 
 deck_template = [('A','H'),(2,'H'),(3,'H'),(4,'H'),(5,'H'),(6,'H'),(7,'H'),(8,'H'),(9,'H'),(10,'H'),('J','H'),('Q','H'),('K','H'),
 ('A','D'),(2,'D'),(3,'D'),(4,'D'),(5,'D'),(6,'D'),(7,'D'),(8,'D'),(9,'D'),(10,'D'),('J','D'),('Q','D'),('K','D'),
@@ -248,6 +249,7 @@ def process_split(player_posn, hand_num=0):
 		print("You cannot split this hand.")
 	elif not check_funding(player_posn, players[player_posn]['bet'][hand_num]*2):
 		print("You don't have enough money for this... but we'll let you do it anyway.")
+		sleep(0.5)
 
 	split_hands(player_posn, hand_num)
 		
@@ -278,6 +280,7 @@ def process_double(player_posn, hand_num=0):
 		return
 	elif not check_funding(player_posn, get_bet(player_posn, hand_num)*2):
 		print("{}, you don't have enough money for this... but we'll let you do it anyway.".format(get_name(player_posn)))
+		sleep(0.5)
 	
 	set_bet(player_posn, get_bet(player_posn, hand_num)*2)
 	change_player_status(player_posn, 'doubling', hand_num)
@@ -285,6 +288,7 @@ def process_double(player_posn, hand_num=0):
 	
 	print_board(False, player_posn,hand_num,len(get_hand(player_posn, hand_num))-1)
 	print("\nHand is doubled. {}'s turn is over.".format(get_name(player_posn)))
+	sleep(1)
 
 	if check_busted(player_posn, hand_num):
 		change_player_status(player_posn, 'loss', hand_num) 
@@ -460,6 +464,7 @@ def print_board(show_dealer_hand, player_posn="All", hand_num="All", hidden_card
 	else:  #print all players, assumes no need to hide any cards
 		for player in range(1,len(players)):
 			print_all_hands(player)
+
 
 def print_all_hands(player_posn):
 	for num in range(len(get_hand(player_posn))):
@@ -864,21 +869,25 @@ def process_hit(player_posn, hand_num=0):
 	
 	print("\n{} hits.".format(get_name(player_posn)))
 	hit(player_posn, deck, hand_num)
+	sleep(1)
 	
 	#if hitting due to a doubling move, do not show last card until game is over.
 	if get_player_status(player_posn, hand_num) == "doubling":
 		print_board(False, player_posn, hand_num, len(get_hand(player_posn, hand_num))-1)
 		print("Card dealt. {}'s turn is over.".format(get_name(player_posn)))
+		sleep(1)
 	
 	elif check_busted(player_posn, hand_num):
 		print_board(False, player_posn, hand_num) 
 		print("Busted. {}'s turn is over.".format(get_name(player_posn)))
 		change_player_status(player_posn, 'loss', hand_num)
+		sleep(1)
 		
 	elif check_21(player_posn, hand_num):
 		print_board(False, player_posn, hand_num)
 		print("Total is 21. {}'s turn is over.".format(get_name(player_posn)))
 		change_player_status(player_posn, 'done', hand_num)
+		sleep(1)
 
 		
 def dealer_play():
@@ -893,7 +902,7 @@ def dealer_play():
 			hit(0, deck)
 		else:
 			change_player_status(0, 'done')
-	
+	sleep(0.5)
 	
 	
 def player_play(player_posn, hand_num=0):
@@ -913,6 +922,7 @@ def player_play(player_posn, hand_num=0):
 		if check_21(player_posn, hand_num):
 			change_player_status(player_posn, 'done', hand_num)
 			print("Total is 21. {}'s turn is over.".format(get_name(player_posn)))
+			sleep(1)
 		
 		else:
 			print_options(player_posn, hand_num)
@@ -927,7 +937,8 @@ def player_play(player_posn, hand_num=0):
 				
 			elif move == "2":
 				print("\n{} stands. Turn is over.".format(get_name(player_posn)))
-				change_player_status(player_posn,'done', hand_num) 
+				change_player_status(player_posn,'done', hand_num)
+				sleep(1) 
 			
 			elif move == "3":
 				process_double(player_posn, hand_num)
@@ -1027,6 +1038,7 @@ def play_blackjack():
 		dealer_play()
 	
 	print_board(True)
+	sleep(0.5)
 	check_winner()				
 	
 

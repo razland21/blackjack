@@ -1,12 +1,10 @@
 BUGS
 
 In Progress
-- multiple players 
----> think about how board prints...show as player's turns happen?
+- time delay between printing boards/moves
 
 Backlog
 - announce blackjack ahead of time before remaining players start?
-- time delay between printing boards and/or press enter to continue
 - able to change blackjack multiplier
 - insurance if dealer is showing A
 - splitting As: only get one card each (same behavior as doubling)
@@ -38,7 +36,8 @@ Completed Tasks
 + need to convert players into list since order will matter
 + player(s) can input their own name
 + bets can be floats
-
++ multiple players 
+---> think about how board prints...show as player's turns happen?
 
 Completed Bugs
 [+] 1. Double after split: Hand 2 printed after hand 1, but before hand 2 turn.  [DAS-bugs.txt, line 92]

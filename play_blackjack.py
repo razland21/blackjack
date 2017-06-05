@@ -85,13 +85,13 @@ def view_rules():
 	Prints out rules currently set for game.
 	"""
 			
-	print "\n***GAME RULES***\n"
-	print "Goal: Get as close to 21 as you can without going over. If you get closer to 21 than the dealer does, you win.\n"
-	print "- Minimum bet: ${}".format(rules['min_bet'])
-	print "- Doubling allowed on {}. Only one additional card is given to you if you double.".format(print_double_str())
-	print "- Number of decks used in game: {}".format(rules['num_decks'])
-	print "- Deck is shuffled when it has less than {} cards remaining.".format(rules['shuffle'])
-	print ""
+	print("\n***GAME RULES***\n")
+	print("Goal: Get as close to 21 as you can without going over. If you get closer to 21 than the dealer does, you win.\n")
+	print(("- Minimum bet: ${}".format(rules['min_bet'])))
+	print(("- Doubling allowed on {}. Only one additional card is given to you if you double.".format(print_double_str())))
+	print(("- Number of decks used in game: {}".format(rules['num_decks'])))
+	print(("- Deck is shuffled when it has less than {} cards remaining.".format(rules['shuffle'])))
+	print("")
 
 def process_rule_change(rule, new_value):
 	"""
@@ -105,22 +105,22 @@ def process_rule_change(rule, new_value):
 	
 	rule_changed = False
 	
-	if rule not in rules.keys():
-		print "That rule is invalid. No changes will be made."
+	if rule not in list(rules.keys()):
+		print("That rule is invalid. No changes will be made.")
 	elif not new_value.isdigit():
-			print "You must enter an integer greater than 0.\n"
+			print("You must enter an integer greater than 0.\n")
 	elif rule == "doubling_allowed":
 		if int(new_value) > 4:
-			print "You must enter one of the numbers above.\n"
+			print("You must enter one of the numbers above.\n")
 			return rule_changed
 		elif new_value == "1":
-			rules[rule] = range(8,12)
+			rules[rule] = list(range(8,12))
 		elif new_value == "2":
-			rules[rule] = range(9,12)
+			rules[rule] = list(range(9,12))
 		elif new_value == "3":
-			rules[rule] = range(9,12)
+			rules[rule] = list(range(9,12))
 		elif new_value == "4":
-			rules[rule] = range(2,22)
+			rules[rule] = list(range(2,22))
 		rule_changed = True
 	else:
 		rules[rule] = int(new_value)
@@ -136,59 +136,59 @@ def change_rules():
 	change = True
 	
 	while change:
-		print "\nYou can change the following rules:"
-		print "    1: Minimum bet"
-		print "    2: Doubling rules"
-		print "    3: Number of decks used in game"
-		print "    4: Shuffling threshold"
-		print "\nEnter number of rule to change or enter 'quit' to go back to the main menu."
+		print("\nYou can change the following rules:")
+		print("    1: Minimum bet")
+		print("    2: Doubling rules")
+		print("    3: Number of decks used in game")
+		print("    4: Shuffling threshold")
+		print("\nEnter number of rule to change or enter 'quit' to go back to the main menu.")
 		
-		choice = raw_input(" > ").strip().lower()
+		choice = input(" > ").strip().lower()
 		
 		if choice == "1":
-			print "\nCurrent minimum bet: ${}".format(rules['min_bet'])
-			print "Enter a new minimum bet. It must be a positive integer."
+			print(("\nCurrent minimum bet: ${}".format(rules['min_bet'])))
+			print("Enter a new minimum bet. It must be a positive integer.")
 			
-			new_min_bet = raw_input(" > ").strip()
+			new_min_bet = input(" > ").strip()
 			
 			if process_rule_change('min_bet', new_min_bet):
-				print "\nThe minimum bet required is now ${}.".format(rules['min_bet'])
+				print(("\nThe minimum bet required is now ${}.".format(rules['min_bet'])))
 
 		elif choice == "2":
-			print "Doubling is currently allowed on {}.".format(print_double_str())
-			print "\nPick from one of the following rules:"
-			print "    1: Double on 8, 9, 10, 11 only"
-			print "    2: Double on 9, 10, 11 only"
-			print "    3: Double on 10, 11 only"
-			print "    4: Double on any two cards"
+			print(("Doubling is currently allowed on {}.".format(print_double_str())))
+			print("\nPick from one of the following rules:")
+			print("    1: Double on 8, 9, 10, 11 only")
+			print("    2: Double on 9, 10, 11 only")
+			print("    3: Double on 10, 11 only")
+			print("    4: Double on any two cards")
 			
-			new_doubling = raw_input(" > ").strip().lower()
+			new_doubling = input(" > ").strip().lower()
 			
 			if process_rule_change('doubling_allowed', new_doubling):
-				print "\nYou can now double down on {}.".format(print_double_str())
+				print(("\nYou can now double down on {}.".format(print_double_str())))
 			
 		elif choice == "3":
-			print "\nCurrent number of decks used in game: {}".format(rules['num_decks'])
-			print "Enter the number of decks you want to use. It must be a positive integer."
+			print("\nCurrent number of decks used in game: {}".format(rules['num_decks']))
+			print("Enter the number of decks you want to use. It must be a positive integer.")
 			
-			new_num_decks = raw_input(" > ").strip()
+			new_num_decks = input(" > ").strip()
 			
 			if process_rule_change('num_decks', new_num_decks):
-				print "\nThe number of decks used in game is now {}.".format(rules['num_decks'])
+				print("\nThe number of decks used in game is now {}.".format(rules['num_decks']))
 
 		elif choice == "4":
-			print "\nGame currently shuffles deck when it has less than {} cards.".format(rules['shuffle'])
-			print "Enter a new shuffling threshold. It must be a positive integer."
+			print("\nGame currently shuffles deck when it has less than {} cards.".format(rules['shuffle']))
+			print("Enter a new shuffling threshold. It must be a positive integer.")
 			
-			new_shuffle = raw_input(" > ").strip()
+			new_shuffle = input(" > ").strip()
 			
 			if process_rule_change('shuffle', new_shuffle):
-				print "\nThe new shuffling threshold is now {}.".format(rules['shuffle'])
+				print("\nThe new shuffling threshold is now {}.".format(rules['shuffle']))
 
 		elif choice == "quit":
 			change = False
 		else:
-			print "Sorry, I don't know what you mean by {}.".format(choice)
+			print("Sorry, I don't know what you mean by {}.".format(choice))
 
 
 #SPLITTING
@@ -243,9 +243,9 @@ def process_split(player_posn, hand_num=0):
 	"""
 	
 	if not check_split(player_posn):
-		print "You cannot split this hand."
+		print("You cannot split this hand.")
 	elif not check_funding(player_posn, players[player_posn]['bet'][hand_num]*2):
-		print "You don't have enough money for this... but we'll let you do it anyway."
+		print("You don't have enough money for this... but we'll let you do it anyway.")
 
 	split_hands(player_posn, hand_num)
 		
@@ -272,17 +272,17 @@ def process_double(player_posn, hand_num=0):
 	"""
 	
 	if not check_double(player_posn, hand_num):
-		print "{}, you cannot double down on this hand.".format(get_name(player_posn))
+		print("{}, you cannot double down on this hand.".format(get_name(player_posn)))
 		return
 	elif not check_funding(player_posn, get_bet(player_posn, hand_num)*2):
-		print "{}, you don't have enough money for this... but we'll let you do it anyway.".format(get_name(player_posn))
+		print("{}, you don't have enough money for this... but we'll let you do it anyway.".format(get_name(player_posn)))
 	
 	set_bet(player_posn, get_bet(player_posn, hand_num)*2)
 	change_player_status(player_posn, 'doubling', hand_num)
 	hit(player_posn, deck, hand_num)
 	
 	print_board(False, player_posn,hand_num,len(get_hand(player_posn, hand_num))-1)
-	print "\nHand is doubled. {}'s turn is over.".format(get_name(player_posn))
+	print("\nHand is doubled. {}'s turn is over.".format(get_name(player_posn)))
 
 	if check_busted(player_posn, hand_num):
 		change_player_status(player_posn, 'loss', hand_num) 
@@ -304,10 +304,10 @@ def check_valid_bet(bet):
 	try:
 		float(bet)
 	except:
-		print "You must enter a number greater than 0.\n"
+		print("You must enter a number greater than 0.\n")
 		return False
 	if float(bet) < rules['min_bet']:
-		print "You must bet at least ${:.2f}.\n".format(rules['min_bet'])
+		print("You must bet at least ${:.2f}.\n".format(rules['min_bet']))
 		return False
 	else:
 		return True
@@ -348,7 +348,7 @@ def set_bet(player_posn, bet, bet_num=0):
 	"""
 	
 	players[player_posn]['bet'][bet_num] = bet
-	print "{} has bet ${:.2f} in this round for Hand {}.\n".format(get_name(player_posn),bet,bet_num+1)
+	print("{} has bet ${:.2f} in this round for Hand {}.\n".format(get_name(player_posn),bet,bet_num+1))
 	
 	
 def change_total_money(player_posn, amount):
@@ -359,9 +359,9 @@ def change_total_money(player_posn, amount):
 	- amount: a float representing the amount that the player's total should change by
 	"""
 	
-	print "\n{}'s previous total money: ${:.2f}".format(get_name(player_posn), players[player_posn]['money'])
+	print("\n{}'s previous total money: ${:.2f}".format(get_name(player_posn), players[player_posn]['money']))
 	players[player_posn]['money'] += ceil(float(amount)*100)/100
-	print "{}'s current total money: ${:.2f}\n".format(get_name(player_posn), players[player_posn]['money'])
+	print("{}'s current total money: ${:.2f}\n".format(get_name(player_posn), players[player_posn]['money']))
 
 	
 def calculate_change(player_posn, rule, bet_num=0):
@@ -380,7 +380,7 @@ def calculate_change(player_posn, rule, bet_num=0):
 	if rule in rules:
 		total = get_bet(player_posn, bet_num) * rules[rule]
 	else:
-		print "{} is an invalid rule. No change will be made to {}'s total".format(rule, get_name(player_posn))
+		print("{} is an invalid rule. No change will be made to {}'s total".format(rule, get_name(player_posn)))
 	
 	return ceil(float(total)*100)/100
 
@@ -400,7 +400,7 @@ def shuffle_deck(deck_lst):
 	decks_added = 0
 	
 	while decks_added < rules['num_decks']:
-		card_indices = range(52)
+		card_indices = list(range(52))
 		shuffle(card_indices)
 		
 		for index in card_indices:
@@ -408,7 +408,7 @@ def shuffle_deck(deck_lst):
 		
 		decks_added += 1
 		
-	print "Cards have been shuffled.\n"
+	print("Cards have been shuffled.\n")
 	
 	
 def deal_cards(num_cards, deck_lst):
@@ -439,10 +439,10 @@ def print_board(show_dealer_hand, player_posn="All", hand_num="All", hidden_card
 	- hand_num: an int representing the position of the hand in the player's hand list or a string representing all hands to be shown. Default is "All" (full list of hands).
 	- hidden_card: an int representing the position of a card that should be hidden or a string representing all cards to be shown. Default is "No" (full list of cards).
 	"""
-	print "\n***DEALER***"
+	print("\n***DEALER***")
 	if show_dealer_hand:
 		print_hand(0)
-		print "\nDealer Total: {}".format(sum_cards(0))
+		print("\nDealer Total: {}".format(sum_cards(0)))
 
 	else:
 		print_hand(0, 0, 0)
@@ -473,7 +473,7 @@ def print_player_board(player_posn, hand_num=0, hidden_card="No"):
 	- hidden_card: an int representing the position of a card that should be hidden or a string representing all cards to be shown. Default is "No" (full list of cards).
 	"""
 	
-	print "\n\n***PLAYER {} - {} - HAND {}***".format(player_posn, get_name(player_posn).upper(), hand_num+1)
+	print("\n\n***PLAYER {} - {} - HAND {}***".format(player_posn, get_name(player_posn).upper(), hand_num+1))
 	print_hand(player_posn, hand_num, hidden_card)
 
 	if get_player_status(player_posn, hand_num) != "doubling":
@@ -488,7 +488,7 @@ def print_total(player_posn, hand_num=0):
 	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	"""
 	
-	print "\nHand {} Total: {}\n".format(hand_num+1, sum_cards(player_posn, hand_num))		
+	print("\nHand {} Total: {}\n".format(hand_num+1, sum_cards(player_posn, hand_num)))		
 
 	
 def get_hand(player_posn, hand_num="All"):
@@ -518,29 +518,29 @@ def print_hand(player_posn, hand_num=0, hidden_card="No"):
 	hand = players[player_posn]['hand'][hand_num]
 	hand_len = len(hand)
 	
-	print "  ______  " * hand_len
-	print " |      | " * hand_len
+	print("  ______  " * hand_len)
+	print(" |      | " * hand_len)
 	
 	for card in hand:
 		if type(hidden_card) == int and hand.index(card) == hidden_card:
-			print " | X    |",
+			print(" | X    |", end=' ')
 			continue
 		elif card[0] == 10:
-			print " | 10   |",
+			print(" | 10   |", end=' ')
 		else:
-			print " | {}    |".format(card[0]),
+			print(" | {}    |".format(card[0]), end=' ')
 	
-	print ""
-	print " |      | " * hand_len
+	print("")
+	print(" |      | " * hand_len)
 	
 	for card in players[player_posn]['hand'][hand_num]:
 		if type(hidden_card) == int and hand.index(card) == hidden_card:
-			print " |    X |",
+			print(" |    X |", end=' ')
 		else:
-			print " |    {} |".format(card[1]),
+			print(" |    {} |".format(card[1]), end=' ')
 	
-	print ""	
-	print " |______| " * hand_len
+	print("")	
+	print(" |______| " * hand_len)
 	
 	
 def highest_sum_cards(player_posn, hand_num=0):
@@ -638,7 +638,7 @@ def check_anyone_has_21():
 	for i in range(1,len(who_has_21)):
 		if who_has_21[i]:
 			if who_has_21[0]:
-				print "{}, both of you have 21. Push.".format(get_name(i))
+				print("{}, both of you have 21. Push.".format(get_name(i)))
 				change_player_status(i,'push')
 			else:
 				change_player_status(i,'win')
@@ -705,14 +705,14 @@ def print_options(player_posn, hand_num=0):
 	- player_posn: an int representing the player
 	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand).
 	"""
-	print "Choose from the following options:"
-	print "    1 - Hit"
-	print "    2 - Stand"
+	print("Choose from the following options:")
+	print("    1 - Hit")
+	print("    2 - Stand")
 	if check_double(player_posn, hand_num):
-		print "    3 - Double"
+		print("    3 - Double")
 	if check_split(player_posn, hand_num):
-		print "    4 - Split"
-	print ""
+		print("    4 - Split")
+	print("")
 
 def check_valid_move(move):
 	"""
@@ -724,13 +724,13 @@ def check_valid_move(move):
 	"""
 	
 	if len(move) == 0:
-		print "You have to put something."
+		print("You have to put something.")
 		return False
 	elif not move.isdigit():
-		print "You must enter a number."
+		print("You must enter a number.")
 		return False
 	elif int(move) > 4:
-		print "You must enter one of the numbers above."
+		print("You must enter one of the numbers above.")
 		return False
 	else:
 		return True
@@ -776,42 +776,42 @@ def check_winner():
 	Checks who won the game. 
 	Note: 0 = dealer. 1+ = players.
 	"""
-	print "----------------------"
-	print " *** GAME RESULTS ***"
-	print "----------------------\n"
+	print("----------------------")
+	print(" *** GAME RESULTS ***")
+	print("----------------------\n")
 	
 	for i in range(1,len(players)):
 		for hand_index in range(len(get_hand(i))):
-			print "PLAYER {} - {} - HAND {}:".format(i, get_name(i).upper(), hand_index+1)
+			print("PLAYER {} - {} - HAND {}:".format(i, get_name(i).upper(), hand_index+1))
 			
 			if check_busted(i, hand_index):
-				print "Busted! You lose."
+				print("Busted! You lose.")
 				change_total_money(i, calculate_change(i,'loss', hand_index))
 			
 			elif get_player_status(i, hand_index) == 'loss':
 				if check_21(0):
-					print "Sorry, dealer has 21.  You lose."
+					print("Sorry, dealer has 21.  You lose.")
 				else: 
-					print "You lose."
+					print("You lose.")
 				change_total_money(i, calculate_change(i,'loss', hand_index))
 
 			elif check_dealer_won(i, hand_index):
-				print "Sorry, dealer won."
+				print("Sorry, dealer won.")
 				change_total_money(i, calculate_change(i, 'loss', hand_index))
 
 			elif sum_cards(i, hand_index) == sum_cards(0):
-				print "Push.\n"
+				print("Push.\n")
 
 			elif check_blackjack(i):
-				print "Player has Blackjack! You win!"
+				print("Player has Blackjack! You win!")
 				change_total_money(i, calculate_change(i,'blackjack', hand_index))
 				
 			else:
 				if check_busted(0):				
-					print "Dealer busted! You win!"
+					print("Dealer busted! You win!")
 					
 				elif sum_cards(i, hand_index) > sum_cards(0):
-					print "Congratulations, you win!"
+					print("Congratulations, you win!")
 					
 				change_total_money(i, calculate_change(i, 'win', hand_index))
 
@@ -860,22 +860,22 @@ def process_hit(player_posn, hand_num=0):
 	- hand_num: an int representing the position of the hand in the player's hand list. Default is 0 (first hand)	
 	"""
 	
-	print "\n{} hits.".format(get_name(player_posn))
+	print("\n{} hits.".format(get_name(player_posn)))
 	hit(player_posn, deck, hand_num)
 	
 	#if hitting due to a doubling move, do not show last card until game is over.
 	if get_player_status(player_posn, hand_num) == "doubling":
 		print_board(False, player_posn, hand_num, len(get_hand(player_posn, hand_num))-1)
-		print "Card dealt. {}'s turn is over.".format(get_name(player_posn))
+		print("Card dealt. {}'s turn is over.".format(get_name(player_posn)))
 	
 	elif check_busted(player_posn, hand_num):
 		print_board(False, player_posn, hand_num) 
-		print "Busted. {}'s turn is over.".format(get_name(player_posn))
+		print("Busted. {}'s turn is over.".format(get_name(player_posn)))
 		change_player_status(player_posn, 'loss', hand_num)
 		
 	elif check_21(player_posn, hand_num):
 		print_board(False, player_posn, hand_num)
-		print "Total is 21. {}'s turn is over.".format(get_name(player_posn))
+		print("Total is 21. {}'s turn is over.".format(get_name(player_posn)))
 		change_player_status(player_posn, 'done', hand_num)
 
 		
@@ -884,7 +884,7 @@ def dealer_play():
 	Processes gameplay loop for dealer.
 	"""
 	
-	print "\nDealer's Turn\n"
+	print("\nDealer's Turn\n")
 	
 	while get_player_status(0) == 'playing':
 		if dealer_must_hit():
@@ -906,15 +906,15 @@ def player_play(player_posn, hand_num=0):
 	while get_player_status(player_posn, hand_num) == 'playing':
 	
 		print_board(False, player_posn, hand_num)
-		print "{}'s Turn - Hand {}\n".format(get_name(player_posn), hand_num+1)
+		print("{}'s Turn - Hand {}\n".format(get_name(player_posn), hand_num+1))
 		
 		if check_21(player_posn, hand_num):
 			change_player_status(player_posn, 'done', hand_num)
-			print "Total is 21. {}'s turn is over.".format(get_name(player_posn))
+			print("Total is 21. {}'s turn is over.".format(get_name(player_posn)))
 		
 		else:
 			print_options(player_posn, hand_num)
-			move = raw_input("Enter the number for the move you want to make: ").strip()
+			move = input("Enter the number for the move you want to make: ").strip()
 			
 			#if move is not valid, start loop over
 			if not check_valid_move(move):
@@ -924,7 +924,7 @@ def player_play(player_posn, hand_num=0):
 				process_hit(player_posn, hand_num)
 				
 			elif move == "2":
-				print "\n{} stands. Turn is over.".format(get_name(player_posn))
+				print("\n{} stands. Turn is over.".format(get_name(player_posn)))
 				change_player_status(player_posn,'done', hand_num) 
 			
 			elif move == "3":
@@ -947,7 +947,7 @@ def play_blackjack():
 	
 	#check if initial game start - ask for # players
 	while initial_start:
-		num_players = raw_input("How many players? ").strip()
+		num_players = input("How many players? ").strip()
 		
 		try:
 			num_players = int(num_players)
@@ -957,22 +957,22 @@ def play_blackjack():
 			initial_start = False
 			
 		except:
-			print "You must input a valid integer.\n"
+			print("You must input a valid integer.\n")
 			
 	
 	#check if player's name is set - if not, ask for name
 	for i in range(len(players)):
 		if get_name(i) == "":
-			print "Player {}, what is your name? ".format(i)
-			player_name = raw_input("> ").strip().lower()
+			print("Player {}, what is your name? ".format(i))
+			player_name = input("> ").strip().lower()
 			set_name(i, player_name)
-			print ""
+			print("")
 	
 	
-	print "Minimum bet is ${}.".format(rules['min_bet'])
+	print("Minimum bet is ${}.".format(rules['min_bet']))
 	
 	for i in range(1, len(players)):
-		print "{}'s total money: ${:.2f}".format(get_name(i),players[i]['money'])
+		print("{}'s total money: ${:.2f}".format(get_name(i),players[i]['money']))
 	
 	#reset board
 	reset_board()
@@ -980,19 +980,19 @@ def play_blackjack():
 	#check if player has enough money, adds in $100 increments if not
 	for i in range(1, len(players)):
 		while not check_funding(i, rules['min_bet']):
-			print "Oh no, {}, you're broke! Let's fix that!".format(get_name(i))
+			print("Oh no, {}, you're broke! Let's fix that!".format(get_name(i)))
 			change_total_money(i, 100)
 		
 	#check if deck needs shuffling
 	if deck_needs_shuffling(deck):
-		print ""
+		print("")
 		shuffle_deck(deck)
 	
 	#betting loop: ask for bet/check validity/set bet
 	for i in range(1, len(players)):
 		while True:
-			print "{}, enter the amount you want to bet. ".format(get_name(i))
-			bet = raw_input("> ").strip()
+			print("{}, enter the amount you want to bet. ".format(get_name(i)))
+			bet = input("> ").strip()
 
 			if check_valid_bet(bet):
 				verified_bet = ceil(float(bet)*100)/100
@@ -1000,7 +1000,7 @@ def play_blackjack():
 					set_bet(i, verified_bet)
 					break
 				else:
-					print "{}, you do not have enough money to make that bet. Your current total is ${:.2f}.\n".format(get_name(i), players[i]['money'])
+					print("{}, you do not have enough money to make that bet. Your current total is ${:.2f}.\n".format(get_name(i), players[i]['money']))
 	
 	#deal cards to all people in game
 	for index in range(len(players)):
@@ -1034,36 +1034,36 @@ def print_main_menu():
 	"""
 	Print main menu options
 	"""
-	print "\nSelect from one of the following options:"
-	print "    1: Play Blackjack"
-	print "    2: View Rules"
-	print "    3: Change Rules"
-	print "    4: Quit"
-	print ""
+	print("\nSelect from one of the following options:")
+	print("    1: Play Blackjack")
+	print("    2: View Rules")
+	print("    3: Change Rules")
+	print("    4: Quit")
+	print("")
 
 
 def start_game():
 	"""
 	Main function to start program
 	"""
-	print "\nWELCOME TO BLACKJACK!"
+	print("\nWELCOME TO BLACKJACK!")
 	
 	while True:
 		print_main_menu()
 		
-		choice = raw_input("Enter choice selection: ").strip().lower()
+		choice = input("Enter choice selection: ").strip().lower()
 		if choice == "1":
-			print "Alright, let's play!\n"
+			print("Alright, let's play!\n")
 			play_blackjack()
 		elif choice == "2":
 			view_rules()
 		elif choice == "3":
 			change_rules()
 		elif choice == "4":
-			print "Thanks for playing!"
+			print("Thanks for playing!")
 			break 
 		else:
-			print "Sorry, I'm not sure what you mean by {}.\n".format(choice)
+			print("Sorry, I'm not sure what you mean by {}.\n".format(choice))
 	
 	
 

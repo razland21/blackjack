@@ -122,6 +122,8 @@ def process_rule_change(rule, new_value):
 		elif new_value == "4":
 			rules[rule] = list(range(2,22))
 		rule_changed = True
+	elif rule == "num_decks" and int(new_value) not in range(1,11):
+		print("You must enter an integer between 1 and 10. \n")
 	else:
 		rules[rule] = int(new_value)
 		rule_changed = True
@@ -169,7 +171,7 @@ def change_rules():
 			
 		elif choice == "3":
 			print("\nCurrent number of decks used in game: {}".format(rules['num_decks']))
-			print("Enter the number of decks you want to use. It must be a positive integer.")
+			print("Enter the number of decks you want to use. It must be an integer between 1 and 10.")
 			
 			new_num_decks = input(" > ").strip()
 			
